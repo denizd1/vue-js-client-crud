@@ -87,7 +87,12 @@ export default {
       tutorials: [],
       searchTitle: "",
       headers: [
-        { text: "Title", value: "title", align: "start", sortable: false },
+        {
+          text: "Nokta Adi",
+          value: "nokta_adi",
+          align: "start",
+          sortable: false,
+        },
         { text: "Description", value: "description", sortable: false },
         { text: "Details", value: "details", sortable: false },
         { text: "Status", value: "status", sortable: false },
@@ -109,7 +114,7 @@ export default {
       let params = {};
 
       if (searchTitle) {
-        params["title"] = searchTitle;
+        params["nokta_adi"] = searchTitle;
       }
 
       if (page) {
@@ -198,9 +203,9 @@ export default {
     getDisplayTutorial(tutorial) {
       return {
         id: tutorial.id,
-        title: tutorial.title.substr(0, 20), //+ "...",
-        details: tutorial.details.substr(0, 20),
-        description: tutorial.description.substr(0, 10), //+ "...",
+        nokta_adi: tutorial.nokta_adi.substr(0, 20), //+ "...",
+        details: tutorial.yontem.substr(0, 20),
+        description: tutorial.alt_yontem.substr(0, 10), //+ "...",
         status: tutorial.published ? "Published" : "Pending",
       };
     },
