@@ -1,44 +1,41 @@
 <template>
-    <div style="height: 500px; width: 100%">
-        <l-map
-        v-if="showMap"
-        :zoom="zoom"
-        :center="center"
-        :options="mapOptions"
-        style="height: 80%"
-        @update:center="centerUpdate"
-        @update:zoom="zoomUpdate"
-        >
-        <l-tile-layer
-            :url="url"
-            :attribution="attribution"
-        />
-        <l-marker :lat-lng="withPopup">
-            <l-popup>
-            <div @click="innerClick">
-                I am a popup
-                <p v-show="showParagraph">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-                sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-                Donec finibus semper metus id malesuada.
-                </p>
-            </div>
-            </l-popup>
-        </l-marker>
-        <l-marker :lat-lng="withTooltip">
-            <l-tooltip :options="{ permanent: true, interactive: true }">
-            <div @click="innerClick">
-                I am a tooltip
-                <p v-show="showParagraph">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-                sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-                Donec finibus semper metus id malesuada.
-                </p>
-            </div>
-            </l-tooltip>
-        </l-marker>
-        </l-map>
-    </div>
+  <div style="height: 500px; width: 100%">
+    <l-map
+      v-if="showMap"
+      :zoom="zoom"
+      :center="center"
+      :options="mapOptions"
+      style="height: 80%"
+      @update:center="centerUpdate"
+      @update:zoom="zoomUpdate"
+    >
+      <l-tile-layer :url="url" :attribution="attribution" />
+      <l-marker :lat-lng="withPopup">
+        <l-popup>
+          <div @click="innerClick">
+            I am a popup
+            <p v-show="showParagraph">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+              sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
+              Donec finibus semper metus id malesuada.
+            </p>
+          </div>
+        </l-popup>
+      </l-marker>
+      <l-marker :lat-lng="withTooltip">
+        <l-tooltip :options="{ permanent: true, interactive: true }">
+          <div @click="innerClick">
+            I am a tooltip
+            <p v-show="showParagraph">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+              sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
+              Donec finibus semper metus id malesuada.
+            </p>
+          </div>
+        </l-tooltip>
+      </l-marker>
+    </l-map>
+  </div>
 </template>
 
 <script>
@@ -52,13 +49,13 @@ export default {
     LTileLayer,
     LMarker,
     LPopup,
-    LTooltip
+    LTooltip,
   },
   data() {
     return {
       zoom: 13,
       center: latLng(47.41322, -1.219482),
-      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       withPopup: latLng(47.41322, -1.219482),
@@ -67,9 +64,9 @@ export default {
       currentCenter: latLng(47.41322, -1.219482),
       showParagraph: false,
       mapOptions: {
-        zoomSnap: 0.5
+        zoomSnap: 0.5,
       },
-      showMap: true
+      showMap: true,
     };
   },
   methods: {
@@ -84,7 +81,7 @@ export default {
     },
     innerClick() {
       alert("Click!");
-    }
-  }
+    },
+  },
 };
 </script>

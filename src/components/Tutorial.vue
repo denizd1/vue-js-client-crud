@@ -2,24 +2,7 @@
   <div v-if="currentTutorial" class="py-3 container">
     <div class="row">
       <div class="col-4" style="z-index: 4">
-        <table class="table">
-          <tr>
-            <td>Title</td>
-            <td>{{ currentTutorial.title }}</td>
-          </tr>
-          <tr>
-            <td>Description</td>
-            <td>{{ currentTutorial.description }}</td>
-          </tr>
-          <tr>
-            <td>Details</td>
-            <td>{{ currentTutorial.details }}</td>
-          </tr>
-          <tr>
-            <td>Status</td>
-            <td>{{ currentTutorial.published }}</td>
-          </tr>
-        </table>
+        <detail-table :currentTutorial="currentTutorial"></detail-table>
       </div>
       <div class="col-8" style="z-index: 4">
         <map-view></map-view>
@@ -36,6 +19,7 @@
 import TutorialDataService from "../services/TutorialDataService";
 
 import MapView from "./MapView.vue";
+import DetailTable from "./DetailTable.vue";
 
 export default {
   name: "tutorial",
@@ -46,6 +30,7 @@ export default {
     };
   },
   components: {
+    DetailTable,
     MapView,
   },
   methods: {

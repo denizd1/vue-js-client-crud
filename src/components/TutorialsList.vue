@@ -44,7 +44,7 @@
 
     <v-col cols="12" sm="12">
       <v-card class="mx-auto" tile>
-        <v-card-title>Tutorials</v-card-title>
+        <v-card-title>Projeler</v-card-title>
 
         <v-data-table
           :headers="headers"
@@ -88,15 +88,15 @@ export default {
       searchTitle: "",
       headers: [
         {
-          text: "Nokta Adi",
+          text: "Nokta Adı",
           value: "nokta_adi",
           align: "start",
           sortable: false,
         },
-        { text: "Description", value: "description", sortable: false },
-        { text: "Details", value: "details", sortable: false },
-        { text: "Status", value: "status", sortable: false },
-        { text: "Actions", value: "actions", sortable: false },
+        { text: "Yöntem", value: "yontem", sortable: false },
+        { text: "Alt Yöntem", value: "alt_yontem", sortable: false },
+        { text: "Durum", value: "status", sortable: false },
+        { text: "Güncelle/Sil", value: "actions", sortable: false },
       ],
 
       page: 1,
@@ -204,9 +204,9 @@ export default {
       return {
         id: tutorial.id,
         nokta_adi: tutorial.nokta_adi.substr(0, 20), //+ "...",
-        details: tutorial.yontem.substr(0, 20),
-        description: tutorial.alt_yontem.substr(0, 10), //+ "...",
-        status: tutorial.published ? "Published" : "Pending",
+        yontem: tutorial.yontem.substr(0, 20) + "...",
+        alt_yontem: tutorial.alt_yontem.substr(0, 10), //+ "...",
+        status: tutorial.published ? "Yayında" : "Beklemede",
       };
     },
   },
