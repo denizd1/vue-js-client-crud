@@ -54,14 +54,23 @@
           @click:row="handleClick"
           class="row-pointer"
         >
-          <template v-slot:[`item.actions`]="{ item }">
+          <template
+            v-if="showModeratorBoard || showAdminBoard"
+            v-slot:[`item.actions`]="{ item }"
+          >
             <v-icon
+              v-bind:style="[
+                showModeratorBoard ? { left: '25%' } : { left: 'auto' },
+              ]"
               small
               class="mr-2"
               @click.stop.prevent="editTutorial(item.id)"
               >mdi-pencil</v-icon
             >
-            <v-icon small @click.stop.prevent="deleteTutorial(item.id)"
+            <v-icon
+              v-if="showAdminBoard"
+              small
+              @click.stop.prevent="deleteTutorial(item.id)"
               >mdi-delete</v-icon
             >
           </template>
@@ -80,25 +89,13 @@
 <script>
 import TutorialDataService from "../services/TutorialDataService";
 import SearchDetail from "./SearchDetail.vue";
+
 export default {
   name: "tutorials-list",
   data() {
     return {
       tutorials: [],
       searchTitle: "",
-      headers: [
-        {
-          text: "Nokta Adı",
-          value: "nokta_adi",
-          align: "start",
-          sortable: false,
-        },
-        { text: "Yöntem", value: "yontem", sortable: false },
-        { text: "Alt Yöntem", value: "alt_yontem", sortable: false },
-        { text: "Durum", value: "status", sortable: false },
-        { text: "Güncelle/Sil", value: "actions", sortable: false },
-      ],
-
       page: 1,
       totalPages: 0,
       pageSize: 3,
@@ -108,6 +105,44 @@ export default {
   },
   components: {
     SearchDetail,
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+    showAdminBoard() {
+      if (this.currentUser && this.currentUser.roles) {
+        return this.currentUser.roles.includes("ROLE_ADMIN");
+      }
+      return false;
+    },
+    showModeratorBoard() {
+      if (this.currentUser && this.currentUser.roles) {
+        return this.currentUser.roles.includes("ROLE_MODERATOR");
+      }
+      return false;
+    },
+    headers() {
+      const headers = [
+        {
+          text: "Nokta Adı",
+          value: "nokta_adi",
+          align: "start",
+          sortable: false,
+        },
+        { text: "Yöntem", value: "yontem", sortable: false },
+        { text: "Alt Yöntem", value: "alt_yontem", sortable: false },
+        { text: "Durum", value: "status", sortable: false },
+      ];
+      if (this.showAdminBoard || this.showModeratorBoard) {
+        headers.push({
+          text: "Güncelle/Sil",
+          value: "actions",
+          sortable: false,
+        });
+      }
+      return headers;
+    },
   },
   methods: {
     getRequestParams(searchTitle, page, pageSize) {

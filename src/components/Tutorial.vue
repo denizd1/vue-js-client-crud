@@ -1,7 +1,7 @@
 <template>
   <div v-if="currentTutorial" class="py-3 container">
     <div class="row">
-      <div class="col-4" style="z-index: 4">
+      <div class="col-4 table-responsive" style="z-index: 4">
         <detail-table :currentTutorial="currentTutorial"></detail-table>
       </div>
       <div class="col-8" style="z-index: 4">
