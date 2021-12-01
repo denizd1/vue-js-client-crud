@@ -1,32 +1,32 @@
 <template>
   <div class="submit-form mt-3 mx-auto">
-    <p class="headline">Add Tutorial</p>
+    <p class="headline">Proje Ekle</p>
 
     <div v-if="!submitted">
       <v-form ref="form" lazy-validation>
         <v-text-field
           v-model="tutorial.title"
-          :rules="[(v) => !!v || 'Title is required']"
-          label="Title"
+          :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
+          label="Nokta Adı"
           required
         ></v-text-field>
 
         <v-text-field
           v-model="tutorial.description"
-          :rules="[(v) => !!v || 'Description is required']"
-          label="Description"
+          :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
+          label="İl"
           required
         ></v-text-field>
 
         <v-text-field
           v-model="tutorial.details"
-          :rules="[(v) => !!v || 'Details is required']"
-          label="Details"
+          :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
+          label="İlçe"
           required
         ></v-text-field>
       </v-form>
 
-      <v-btn color="primary" class="mt-3" @click="saveTutorial">Submit</v-btn>
+      <v-btn color="primary" class="mt-3" @click="saveTutorial">Kaydet</v-btn>
     </div>
 
     <div v-else>
@@ -61,6 +61,17 @@ export default {
       },
       submitted: false,
     };
+  },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (
+        !vm.$store.state.auth.user ||
+        !vm.$store.state.auth.user.roles.includes("ROLE_ADMIN") ||
+        !vm.$store.state.auth.user.roles.includes("ROLE_MODERATOR")
+      ) {
+        next({ name: "home" });
+      }
+    });
   },
   methods: {
     saveTutorial() {

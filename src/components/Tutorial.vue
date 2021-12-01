@@ -45,10 +45,19 @@ export default {
         });
     },
   },
-  mounted() {
-    this.message = "";
-    this.getTutorial(this.$route.params.id);
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (vm.$store.state.auth.user) {
+        vm.getTutorial(vm.$route.params.id);
+      } else {
+        next({ name: "home" });
+      }
+    });
   },
+  // mounted() {
+  //   this.message = "";
+  //   this.getTutorial(this.$route.params.id);
+  // },
 };
 </script>
 

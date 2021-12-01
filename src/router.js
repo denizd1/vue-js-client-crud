@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import Register from './views/Register.vue';
+// import store from '@/store/index.js';
 Vue.use(Router);
 
 export const router = new Router({
@@ -32,11 +32,7 @@ export const router = new Router({
     {
       path: '/',
       name: 'home',
-      component: Home
-    },
-    {
-      path: '/home',
-      component: Home
+      component: Login
     },
     {
       path: '/login',
@@ -52,23 +48,35 @@ export const router = new Router({
       // lazy-loaded
       component: () => import('./views/Profile.vue')
     },
-    {
-      path: '/admin',
-      name: 'admin',
-      // lazy-loaded
-      component: () => import('./views/BoardAdmin.vue')
-    },
-    {
-      path: '/mod',
-      name: 'moderator',
-      // lazy-loaded
-      component: () => import('./views/BoardModerator.vue')
-    },
-    {
-      path: '/user',
-      name: 'user',
-      // lazy-loaded
-      component: () => import('./views/BoardUser.vue')
-    }
+    // {
+    //   path: '/admin',
+    //   name: 'admin',
+    //   // lazy-loaded
+    //   component: () => import('./views/BoardAdmin.vue')
+    // },
+    // {
+    //   path: '/mod',
+    //   name: 'moderator',
+    //   // lazy-loaded
+    //   component: () => import('./views/BoardModerator.vue')
+    // },
+    // {
+    //   path: '/user',
+    //   name: 'user',
+    //   // lazy-loaded
+    //   component: () => import('./views/BoardUser.vue')
+    // }
   ]
 });
+
+// router.beforeResolve((to, from, next) => {
+//   if (to.matched.some(record => record.meta.auth)) {
+//     if (!store.getters.authToken) {
+//       next({ name: 'home' });
+//     } else {
+//       next();
+//     }
+//   } else {
+//     next(); // Very important to call next() in this case!
+//   }
+// })
