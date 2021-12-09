@@ -114,13 +114,13 @@
       >
       </vue-particles>
     </v-main>
-    <footer>
-      <div class="container">
-        <span class="text-muted"
-          >Her Hakkı Saklıdır © MTA {{ new Date().getFullYear() }}</span
-        >
-      </div>
-    </footer>
+    <v-footer padless>
+      <v-row>
+        <v-col class="py-4 text-center" cols="12">
+          Her Hakkı Saklıdır © MTA {{ new Date().getFullYear() }}
+        </v-col>
+      </v-row>
+    </v-footer>
   </v-app>
 </template>
 

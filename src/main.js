@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import store from './store';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import VeeValidate from 'vee-validate';
 import Vuex from 'vuex';
 import { library } from '@fortawesome/fontawesome-svg-core';

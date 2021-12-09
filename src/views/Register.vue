@@ -8,7 +8,7 @@
       />
       <form name="form" @submit.prevent="handleRegister">
         <div v-if="!successful">
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label for="username">Kullanıcı Adı</label>
             <input
               v-model="user.username"
@@ -24,7 +24,7 @@
               {{ errors.first("username") }}
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label for="email">Email</label>
             <input
               v-model="user.email"
@@ -37,7 +37,7 @@
               {{ errors.first("email") }}
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label for="password">Şifre</label>
             <input
               v-model="user.password"
@@ -53,7 +53,7 @@
               {{ errors.first("password") }}
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group mb-3">
             <button class="btn btn-primary btn-block">Kaydol</button>
           </div>
         </div>

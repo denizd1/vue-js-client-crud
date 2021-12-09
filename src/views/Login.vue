@@ -7,7 +7,7 @@
         class="profile-img-card"
       />
       <form name="form" @submit.prevent="handleLogin">
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label for="username">Kullanıcı Adı</label>
           <input
             v-model="user.username"
@@ -24,7 +24,7 @@
             Bu alan boş bırakılamaz
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label for="password">Şifre</label>
           <input
             v-model="user.password"
@@ -41,7 +41,7 @@
             Bu alan boş bırakılamaz
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <button class="btn btn-primary btn-block" :disabled="loading">
             <span
               v-show="loading"
