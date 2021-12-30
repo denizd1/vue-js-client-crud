@@ -90,11 +90,32 @@
       </v-form>
 
       <v-btn color="primary" class="mt-3" @click="saveTutorial">Kaydet</v-btn>
+
+      <div class="mt-3">
+        <label for="formFile" class="form-label"
+          >Yuklemek için bir Excel dosyası seçin.</label
+        >
+        <input
+          class="form-control"
+          type="file"
+          id="formFile"
+          @change="importExcel"
+          accept=".csv"
+        />
+      </div>
+      <div class="mt-3" v-show="show">
+        {{ message }}
+      </div>
+      <!-- <input type="file" @change="importExcel" accept=".csv" /> -->
+
+      <v-btn color="primary" class="mt-3" @click="dataImporter"
+        >Excel Import</v-btn
+      >
     </div>
 
     <div v-else>
       <v-card class="mx-auto">
-        <v-card-title> Proje Başarıyla Eklendi! </v-card-title>
+        <v-card-title> Proje(ler) Başarıyla Eklendi! </v-card-title>
 
         <v-card-subtitle>
           Yeni bir proje eklemek için 'Ekle' butonuna basın.
@@ -110,7 +131,7 @@
 
 <script>
 import TutorialDataService from "../services/TutorialDataService";
-
+import xlsx from "xlsx";
 export default {
   name: "add-tutorial",
   data() {
@@ -1594,7 +1615,10 @@ export default {
       submitted: false,
       fillSubMethod: [],
       fillDistrict: [],
+      excelDatalist: [],
       select: { yontemAdi: "" },
+      message: "",
+      show: false,
     };
   },
   // beforeRouteEnter(to, from, next) {
@@ -1614,6 +1638,83 @@ export default {
     },
   },
   methods: {
+    getHeader(sheet) {
+      const XLSX = xlsx;
+      const headers = [];
+      const range = XLSX.utils.decode_range(sheet["!ref"]); // worksheet['!ref'] Is the valid range of the worksheet
+      let C;
+      /* Get cell value start in the first row */
+      const R = range.s.r; //Line / / column C
+      let i = 0;
+      for (C = range.s.c; C <= range.e.c; ++C) {
+        var cell =
+          sheet[
+            XLSX.utils.encode_cell({ c: C, r: R })
+          ]; /* Get the cell value based on the address  find the cell in the first row */
+        var hdr = "UNKNOWN" + C; // replace with your desired default
+        // XLSX.utils.format_cell Generate cell text value
+        if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
+        if (hdr.indexOf("UNKNOWN") > -1) {
+          if (!i) {
+            hdr = "__EMPTY";
+          } else {
+            hdr = "__EMPTY_" + i;
+          }
+          i++;
+        }
+        headers.push(hdr);
+      }
+      return headers;
+    },
+    /**
+     * Import table
+     */
+    importExcel(e) {
+      this.excelDatalist = [];
+      const files = e.target.files;
+      console.log(files);
+
+      if (!files.length) {
+        this.show = false;
+      } else if (!/\.(csv|xls|xlsx)$/.test(files[0].name.toLowerCase())) {
+        this.show = true;
+        this.message = "Yalnızca .csv uzantılı dosya yukleyebilirsiniz!";
+        return;
+      } else {
+        this.show = false;
+      }
+
+      const fileReader = new FileReader();
+      fileReader.onload = (ev) => {
+        try {
+          const data = ev.target.result;
+
+          const XLSX = xlsx;
+          const workbook = XLSX.read(data, {
+            type: "binary",
+          });
+          const wsname = workbook.SheetNames[0]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
+          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet]    Get the data of the first sheet
+          const excellist = []; // Clear received data
+          // Edit data
+          for (var i = 0; i < ws.length; i++) {
+            excellist.push(ws[i]);
+          }
+          this.excelDatalist = excellist;
+          console.log("Read results", this.excelDatalist); // At this point, you get an array containing objects that need to be processed
+          // Get header2-1
+          const a = workbook.Sheets[workbook.SheetNames[0]];
+          const headers = this.getHeader(a);
+          console.log("headers", headers);
+          // Get header2-2
+        } catch (e) {
+          return alert("Read failure!");
+        }
+      };
+      fileReader.readAsBinaryString(files[0]);
+      // var input = document.getElementById("upload");
+      // input.value = "";
+    },
     handleChange(event) {
       this.methodSubmethod.filter((elem) => {
         if (elem.yontemAdi === event) {
@@ -1634,6 +1735,141 @@ export default {
     },
     save(date) {
       this.$refs.menu.save(date);
+    },
+    dataImporter() {
+      var arr = this.excelDatalist;
+      console.log(this.excelDatalist);
+      for (let i = 0; i < arr.length; i++) {
+        var data = {
+          nokta_adi: arr[i].nokta_adi ? arr[i].nokta_adi : null,
+          yontem: arr[i].yontem ? arr[i].yontem : null,
+          alt_yontem: arr[i].alt_yontem ? arr[i].alt_yontem : null,
+          calisma_amaci: arr[i].calisma_amaci ? arr[i].calisma_amaci : null,
+          satilabilirlik: arr[i].satilabilirlik ? arr[i].satilabilirlik : null,
+          ham_veri: arr[i].ham_veri ? arr[i].ham_veri : null,
+          calisma_tarihi: arr[i].calisma_tarihi ? arr[i].calisma_tarihi : null,
+          proje_kodu: arr[i].proje_kodu ? arr[i].proje_kodu : null,
+          rapor_no: arr[i].rapor_no ? arr[i].rapor_no : null,
+          kuyu_arsiv_no: arr[i].kuyu_arsiv_no ? arr[i].kuyu_arsiv_no : null,
+          jeofizik_arsiv_no: arr[i].jeofizik_arsiv_no
+            ? arr[i].jeofizik_arsiv_no
+            : null,
+          derleme_no: arr[i].derleme_no ? arr[i].derleme_no : null,
+          cd_no: arr[i].cd_no ? arr[i].cd_no : null,
+          il: arr[i].il ? arr[i].il : null,
+          ilce: arr[i].ilce ? arr[i].ilce : null,
+          x: arr[i].x ? arr[i].x : null,
+          y: arr[i].y ? arr[i].y : null,
+          z: arr[i].z ? arr[i].z : null,
+          profil_baslangic_x: arr[i].profil_baslangic_x
+            ? arr[i].profil_baslangic_x
+            : null,
+          profil_baslangic_y: arr[i].profil_baslangic_y
+            ? arr[i].profil_baslangic_y
+            : null,
+          profil_bitis_x: arr[i].profil_bitis_x ? arr[i].profil_bitis_x : null,
+          profil_bitis_y: arr[i].profil_bitis_y ? arr[i].profil_bitis_y : null,
+          zone: arr[i].zone ? arr[i].zone : null,
+          datum: arr[i].datum ? arr[i].datum : null,
+          besyuzbin: arr[i].besyuzbin ? arr[i].besyuzbin : null,
+          yuzbin: arr[i].yuzbin ? arr[i].yuzbin : null,
+          yirmibesbin: arr[i].yirmibesbin ? arr[i].yirmibesbin : null,
+          olculen_parametre_ler: arr[i].olculen_parametre_ler
+            ? arr[i].olculen_parametre_ler
+            : null,
+          acilim_yonu: arr[i].acilim_yonu ? arr[i].acilim_yonu : null,
+          acilim_yontemi: arr[i].acilim_yontemi ? arr[i].acilim_yontemi : null,
+          frekans_araligi: arr[i].frekans_araligi
+            ? arr[i].frekans_araligi
+            : null,
+          mt_olcu_suresisaat: arr[i].mt_olcu_suresisaat
+            ? arr[i].mt_olcu_suresisaat
+            : null,
+
+          z_bileseni: arr[i].z_bileseni ? arr[i].z_bileseni : null,
+
+          amt_olcusu: arr[i].amt_olcusu ? arr[i].amt_olcusu : null,
+
+          amt_olcu_suresi: arr[i].amt_olcu_suresi
+            ? arr[i].amt_olcu_suresi
+            : null,
+
+          tem_olcusu: arr[i].tem_olcusu ? arr[i].tem_olcusu : null,
+
+          kalibrasyon_dosyasi: arr[i].kalibrasyon_dosyasi
+            ? arr[i].kalibrasyon_dosyasi
+            : null,
+
+          veri_formati: arr[i].veri_formati ? arr[i].veri_formati : null,
+
+          ab2_m: arr[i].ab2_m ? arr[i].ab2_m : null,
+
+          derinlik_m_gr: arr[i].derinlik_m_gr ? arr[i].derinlik_m_gr : null,
+
+          derinlik_m_neu: arr[i].derinlik_m_neu ? arr[i].derinlik_m_neu : null,
+          derinlik_m_den: arr[i].derinlik_m_den ? arr[i].derinlik_m_den : null,
+          derinlik_m_res: arr[i].derinlik_m_res ? arr[i].derinlik_m_res : null,
+          derinlik_m_sp: arr[i].derinlik_m_sp ? arr[i].derinlik_m_sp : null,
+          derinlik_m_cal: arr[i].derinlik_m_cal ? arr[i].derinlik_m_cal : null,
+          derinlik_m_term: arr[i].derinlik_m_term
+            ? arr[i].derinlik_m_term
+            : null,
+          derinlik_m_sgr: arr[i].derinlik_m_sgr ? arr[i].derinlik_m_sgr : null,
+          derinlik_m_cbl: arr[i].derinlik_m_cbl ? arr[i].derinlik_m_cbl : null,
+          derinlik_m_son: arr[i].derinlik_m_son ? arr[i].derinlik_m_son : null,
+          derinlik_m_ccl: arr[i].derinlik_m_ccl ? arr[i].derinlik_m_ccl : null,
+          hat_boyu_m: arr[i].hat_boyu_m ? arr[i].hat_boyu_m : null,
+          kayit_boyu_sn: arr[i].kayit_boyu_sn ? arr[i].kayit_boyu_sn : null,
+          sweep_suresi_sn: arr[i].sweep_suresi_sn
+            ? arr[i].sweep_suresi_sn
+            : null,
+          sweep_tipi: arr[i].sweep_tipi ? arr[i].sweep_tipi : null,
+          sweep_sayisi: arr[i].sweep_sayisi ? arr[i].sweep_sayisi : null,
+          sweep_frekanslari_sn_hz: arr[i].sweep_frekanslari_sn_hz
+            ? arr[i].sweep_frekanslari_sn_hz
+            : null,
+          sweep_taper_ms: arr[i].sweep_taper_ms ? arr[i].sweep_taper_ms : null,
+          yayim_tipi: arr[i].yayim_tipi ? arr[i].yayim_tipi : null,
+          offsetm: arr[i].offsetm ? arr[i].offsetm : null,
+          jeofon_dizilimi: arr[i].jeofon_dizilimi
+            ? arr[i].jeofon_dizilimi
+            : null,
+          grup_araligim: arr[i].grup_araligim ? arr[i].grup_araligim : null,
+          atis_araligim: arr[i].atis_araligim ? arr[i].atis_araligim : null,
+          ornekleme_araligim: arr[i].ornekleme_araligim
+            ? arr[i].ornekleme_araligim
+            : null,
+          ekipman: arr[i].ekipman ? arr[i].ekipman : null,
+          enerji_kaynagi: arr[i].enerji_kaynagi ? arr[i].enerji_kaynagi : null,
+          km2: arr[i].km2 ? arr[i].km2 : null,
+          profil_boyukm: arr[i].profil_boyukm ? arr[i].profil_boyukm : null,
+          elektrot_araligi: arr[i].elektrot_araligi
+            ? arr[i].elektrot_araligi
+            : null,
+          dizilim_turu: arr[i].dizilim_turu ? arr[i].dizilim_turu : null,
+          seviye_sayisi: arr[i].seviye_sayisi ? arr[i].seviye_sayisi : null,
+          profil_araligi: arr[i].profil_araligi ? arr[i].profil_araligi : null,
+          a_1: arr[i].a_1 ? arr[i].a_1 : null,
+          a_2: arr[i].a_2 ? arr[i].a_2 : null,
+          a_3: arr[i].a_3 ? arr[i].a_3 : null,
+          a_4: arr[i].a_4 ? arr[i].a_4 : null,
+          dis_loop_boyutu: arr[i].dis_loop_boyutu
+            ? arr[i].dis_loop_boyutu
+            : null,
+          published: false,
+        };
+        TutorialDataService.create(data)
+          .then((response) => {
+            this.tutorial.id = response.data.id;
+            console.log(response.data);
+            this.submitted = true;
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        console.log("bitti");
+      }
+      this.excelDatalist = [];
     },
     saveTutorial() {
       var data = {
@@ -1663,7 +1899,7 @@ export default {
 
 <style>
 .submit-form {
-  max-width: 300px;
+  max-width: 400px;
   position: relative;
   z-index: 4;
 }
