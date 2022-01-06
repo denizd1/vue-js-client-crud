@@ -132,6 +132,7 @@
 <script>
 import TutorialDataService from "../services/TutorialDataService";
 import xlsx from "xlsx";
+// import { Base64 } from "js-base64";
 export default {
   name: "add-tutorial",
   data() {
@@ -1676,7 +1677,7 @@ export default {
 
       if (!files.length) {
         this.show = false;
-      } else if (!/\.(csv|xls|xlsx)$/.test(files[0].name.toLowerCase())) {
+      } else if (!/\.(csv)$/.test(files[0].name.toLowerCase())) {
         this.show = true;
         this.message = "Yalnızca .csv uzantılı dosya yukleyebilirsiniz!";
         return;
@@ -1685,16 +1686,18 @@ export default {
       }
 
       const fileReader = new FileReader();
+
       fileReader.onload = (ev) => {
         try {
           const data = ev.target.result;
 
           const XLSX = xlsx;
           const workbook = XLSX.read(data, {
-            type: "binary",
+            type: "string",
           });
           const wsname = workbook.SheetNames[0]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet]    Get the data of the first sheet
+
           const excellist = []; // Clear received data
           // Edit data
           for (var i = 0; i < ws.length; i++) {
@@ -1711,7 +1714,7 @@ export default {
           return alert("Read failure!");
         }
       };
-      fileReader.readAsBinaryString(files[0]);
+      fileReader.readAsText(files[0]);
       // var input = document.getElementById("upload");
       // input.value = "";
     },
@@ -1738,126 +1741,12 @@ export default {
     },
     dataImporter() {
       var arr = this.excelDatalist;
-      console.log(this.excelDatalist);
       for (let i = 0; i < arr.length; i++) {
-        var data = {
-          nokta_adi: arr[i].nokta_adi ? arr[i].nokta_adi : null,
-          yontem: arr[i].yontem ? arr[i].yontem : null,
-          alt_yontem: arr[i].alt_yontem ? arr[i].alt_yontem : null,
-          calisma_amaci: arr[i].calisma_amaci ? arr[i].calisma_amaci : null,
-          satilabilirlik: arr[i].satilabilirlik ? arr[i].satilabilirlik : null,
-          ham_veri: arr[i].ham_veri ? arr[i].ham_veri : null,
-          calisma_tarihi: arr[i].calisma_tarihi ? arr[i].calisma_tarihi : null,
-          proje_kodu: arr[i].proje_kodu ? arr[i].proje_kodu : null,
-          rapor_no: arr[i].rapor_no ? arr[i].rapor_no : null,
-          kuyu_arsiv_no: arr[i].kuyu_arsiv_no ? arr[i].kuyu_arsiv_no : null,
-          jeofizik_arsiv_no: arr[i].jeofizik_arsiv_no
-            ? arr[i].jeofizik_arsiv_no
-            : null,
-          derleme_no: arr[i].derleme_no ? arr[i].derleme_no : null,
-          cd_no: arr[i].cd_no ? arr[i].cd_no : null,
-          il: arr[i].il ? arr[i].il : null,
-          ilce: arr[i].ilce ? arr[i].ilce : null,
-          x: arr[i].x ? arr[i].x : null,
-          y: arr[i].y ? arr[i].y : null,
-          z: arr[i].z ? arr[i].z : null,
-          profil_baslangic_x: arr[i].profil_baslangic_x
-            ? arr[i].profil_baslangic_x
-            : null,
-          profil_baslangic_y: arr[i].profil_baslangic_y
-            ? arr[i].profil_baslangic_y
-            : null,
-          profil_bitis_x: arr[i].profil_bitis_x ? arr[i].profil_bitis_x : null,
-          profil_bitis_y: arr[i].profil_bitis_y ? arr[i].profil_bitis_y : null,
-          zone: arr[i].zone ? arr[i].zone : null,
-          datum: arr[i].datum ? arr[i].datum : null,
-          besyuzbin: arr[i].besyuzbin ? arr[i].besyuzbin : null,
-          yuzbin: arr[i].yuzbin ? arr[i].yuzbin : null,
-          yirmibesbin: arr[i].yirmibesbin ? arr[i].yirmibesbin : null,
-          olculen_parametre_ler: arr[i].olculen_parametre_ler
-            ? arr[i].olculen_parametre_ler
-            : null,
-          acilim_yonu: arr[i].acilim_yonu ? arr[i].acilim_yonu : null,
-          acilim_yontemi: arr[i].acilim_yontemi ? arr[i].acilim_yontemi : null,
-          frekans_araligi: arr[i].frekans_araligi
-            ? arr[i].frekans_araligi
-            : null,
-          mt_olcu_suresisaat: arr[i].mt_olcu_suresisaat
-            ? arr[i].mt_olcu_suresisaat
-            : null,
-
-          z_bileseni: arr[i].z_bileseni ? arr[i].z_bileseni : null,
-
-          amt_olcusu: arr[i].amt_olcusu ? arr[i].amt_olcusu : null,
-
-          amt_olcu_suresi: arr[i].amt_olcu_suresi
-            ? arr[i].amt_olcu_suresi
-            : null,
-
-          tem_olcusu: arr[i].tem_olcusu ? arr[i].tem_olcusu : null,
-
-          kalibrasyon_dosyasi: arr[i].kalibrasyon_dosyasi
-            ? arr[i].kalibrasyon_dosyasi
-            : null,
-
-          veri_formati: arr[i].veri_formati ? arr[i].veri_formati : null,
-
-          ab2_m: arr[i].ab2_m ? arr[i].ab2_m : null,
-
-          derinlik_m_gr: arr[i].derinlik_m_gr ? arr[i].derinlik_m_gr : null,
-
-          derinlik_m_neu: arr[i].derinlik_m_neu ? arr[i].derinlik_m_neu : null,
-          derinlik_m_den: arr[i].derinlik_m_den ? arr[i].derinlik_m_den : null,
-          derinlik_m_res: arr[i].derinlik_m_res ? arr[i].derinlik_m_res : null,
-          derinlik_m_sp: arr[i].derinlik_m_sp ? arr[i].derinlik_m_sp : null,
-          derinlik_m_cal: arr[i].derinlik_m_cal ? arr[i].derinlik_m_cal : null,
-          derinlik_m_term: arr[i].derinlik_m_term
-            ? arr[i].derinlik_m_term
-            : null,
-          derinlik_m_sgr: arr[i].derinlik_m_sgr ? arr[i].derinlik_m_sgr : null,
-          derinlik_m_cbl: arr[i].derinlik_m_cbl ? arr[i].derinlik_m_cbl : null,
-          derinlik_m_son: arr[i].derinlik_m_son ? arr[i].derinlik_m_son : null,
-          derinlik_m_ccl: arr[i].derinlik_m_ccl ? arr[i].derinlik_m_ccl : null,
-          hat_boyu_m: arr[i].hat_boyu_m ? arr[i].hat_boyu_m : null,
-          kayit_boyu_sn: arr[i].kayit_boyu_sn ? arr[i].kayit_boyu_sn : null,
-          sweep_suresi_sn: arr[i].sweep_suresi_sn
-            ? arr[i].sweep_suresi_sn
-            : null,
-          sweep_tipi: arr[i].sweep_tipi ? arr[i].sweep_tipi : null,
-          sweep_sayisi: arr[i].sweep_sayisi ? arr[i].sweep_sayisi : null,
-          sweep_frekanslari_sn_hz: arr[i].sweep_frekanslari_sn_hz
-            ? arr[i].sweep_frekanslari_sn_hz
-            : null,
-          sweep_taper_ms: arr[i].sweep_taper_ms ? arr[i].sweep_taper_ms : null,
-          yayim_tipi: arr[i].yayim_tipi ? arr[i].yayim_tipi : null,
-          offsetm: arr[i].offsetm ? arr[i].offsetm : null,
-          jeofon_dizilimi: arr[i].jeofon_dizilimi
-            ? arr[i].jeofon_dizilimi
-            : null,
-          grup_araligim: arr[i].grup_araligim ? arr[i].grup_araligim : null,
-          atis_araligim: arr[i].atis_araligim ? arr[i].atis_araligim : null,
-          ornekleme_araligim: arr[i].ornekleme_araligim
-            ? arr[i].ornekleme_araligim
-            : null,
-          ekipman: arr[i].ekipman ? arr[i].ekipman : null,
-          enerji_kaynagi: arr[i].enerji_kaynagi ? arr[i].enerji_kaynagi : null,
-          km2: arr[i].km2 ? arr[i].km2 : null,
-          profil_boyukm: arr[i].profil_boyukm ? arr[i].profil_boyukm : null,
-          elektrot_araligi: arr[i].elektrot_araligi
-            ? arr[i].elektrot_araligi
-            : null,
-          dizilim_turu: arr[i].dizilim_turu ? arr[i].dizilim_turu : null,
-          seviye_sayisi: arr[i].seviye_sayisi ? arr[i].seviye_sayisi : null,
-          profil_araligi: arr[i].profil_araligi ? arr[i].profil_araligi : null,
-          a_1: arr[i].a_1 ? arr[i].a_1 : null,
-          a_2: arr[i].a_2 ? arr[i].a_2 : null,
-          a_3: arr[i].a_3 ? arr[i].a_3 : null,
-          a_4: arr[i].a_4 ? arr[i].a_4 : null,
-          dis_loop_boyutu: arr[i].dis_loop_boyutu
-            ? arr[i].dis_loop_boyutu
-            : null,
-          published: false,
-        };
+        var data = {};
+        Object.entries(this.excelDatalist[i]).forEach(([key, value]) => {
+          data[key] = value ? value : null; // key - value
+        });
+        console.log("data", data);
         TutorialDataService.create(data)
           .then((response) => {
             this.tutorial.id = response.data.id;
@@ -1867,7 +1756,6 @@ export default {
           .catch((e) => {
             console.log(e);
           });
-        console.log("bitti");
       }
       this.excelDatalist = [];
     },

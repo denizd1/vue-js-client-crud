@@ -5,7 +5,7 @@
         <detail-table :currentTutorial="currentTutorial"></detail-table>
       </div>
       <div class="col-8" style="z-index: 4">
-        <map-view></map-view>
+        <map-view :currentTutorial="currentTutorial"></map-view>
       </div>
     </div>
     <p class="mt-3">{{ message }}</p>
@@ -38,7 +38,7 @@ export default {
       TutorialDataService.get(id)
         .then((response) => {
           this.currentTutorial = response.data;
-          console.log(response.data);
+          // console.log(response.data);
         })
         .catch((e) => {
           console.log(e);

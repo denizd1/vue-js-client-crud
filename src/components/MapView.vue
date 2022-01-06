@@ -10,63 +10,43 @@
       @update:zoom="zoomUpdate"
     >
       <l-tile-layer :url="url" :attribution="attribution" />
-      <l-marker :lat-lng="withPopup">
-        <l-popup>
-          <div @click="innerClick">
-            I am a popup
-            <p v-show="showParagraph">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-              sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-              Donec finibus semper metus id malesuada.
-            </p>
-          </div>
-        </l-popup>
-      </l-marker>
-      <l-marker :lat-lng="withTooltip">
-        <l-tooltip :options="{ permanent: true, interactive: true }">
-          <div @click="innerClick">
-            I am a tooltip
-            <p v-show="showParagraph">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-              sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-              Donec finibus semper metus id malesuada.
-            </p>
-          </div>
-        </l-tooltip>
-      </l-marker>
+
+      <l-marker v-if="withTooltip" :lat-lng="withTooltip" />
+      <l-polyline
+        v-if="polyline"
+        :lat-lngs="polyline.latlngs"
+        :color="polyline.color"
+      />
     </l-map>
   </div>
 </template>
 
 <script>
 import { latLng } from "leaflet";
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
+import "leaflet.utm";
+import { LMap, LTileLayer, LMarker, LPolyline } from "vue2-leaflet";
+import { Icon } from "leaflet";
+import * as L from "leaflet";
+delete Icon.Default.prototype._getIconUrl;
+Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+});
 
 export default {
   name: "MapView",
+  props: ["currentTutorial"],
   components: {
     LMap,
     LTileLayer,
     LMarker,
-    LPopup,
-    LTooltip,
+    LPolyline,
   },
   data() {
     return {
-      zoom: 13,
-      center: latLng(47.41322, -1.219482),
-      url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-      attribution:
-        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      withPopup: latLng(47.41322, -1.219482),
-      withTooltip: latLng(47.41422, -1.250482),
-      currentZoom: 11.5,
-      currentCenter: latLng(47.41322, -1.219482),
-      showParagraph: false,
-      mapOptions: {
-        zoomSnap: 0.5,
-      },
-      showMap: true,
+      withTooltip: null,
+      polyline: null,
     };
   },
   methods: {
@@ -76,12 +56,72 @@ export default {
     centerUpdate(center) {
       this.currentCenter = center;
     },
-    showLongText() {
-      this.showParagraph = !this.showParagraph;
-    },
-    innerClick() {
-      alert("Click!");
-    },
+  },
+  beforeMount() {
+    (this.zoom = 11.5),
+      (this.url = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"),
+      (this.attribution =
+        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'),
+      (this.currentZoom = 11.5),
+      (this.showParagraph = false),
+      (this.mapOptions = {
+        zoomSnap: 0.5,
+      }),
+      (this.showMap = true);
+    if (this.currentTutorial.datum == "WGS_84") {
+      if (this.currentTutorial.x && this.currentTutorial.y) {
+        var pointIcon = L.utm({
+          x: this.currentTutorial.x,
+          y: this.currentTutorial.y,
+          zone: this.currentTutorial.zone ? this.currentTutorial.zone : 0,
+          southHemi: false,
+        });
+        (this.center = latLng(pointIcon.latLng().lat, pointIcon.latLng().lng)),
+          (this.withTooltip = latLng(
+            pointIcon.latLng().lat,
+            pointIcon.latLng().lng
+          )),
+          (this.currentCenter = latLng(
+            pointIcon.latLng().lat,
+            pointIcon.latLng().lng
+          ));
+
+        this.withTooltip = latLng(
+          pointIcon.latLng().lat,
+          pointIcon.latLng().lng
+        );
+      }
+      if (
+        this.currentTutorial.profil_baslangic_x &&
+        this.currentTutorial.profil_baslangic_y &&
+        this.currentTutorial.profil_bitis_x &&
+        this.currentTutorial.profil_bitis_y
+      ) {
+        var polyLineStart = L.utm({
+          x: this.currentTutorial.profil_baslangic_x,
+          y: this.currentTutorial.profil_baslangic_y,
+          zone: this.currentTutorial.zone ? this.currentTutorial.zone : 0,
+          southHemi: false,
+        });
+        var polyLineEnd = L.utm({
+          x: this.currentTutorial.profil_bitis_x,
+          y: this.currentTutorial.profil_bitis_y,
+          zone: this.currentTutorial.zone ? this.currentTutorial.zone : 0,
+          southHemi: false,
+        });
+        (this.center = latLng(
+          (polyLineStart.latLng().lat + polyLineEnd.latLng().lat) / 2,
+          (polyLineStart.latLng().lng + polyLineEnd.latLng().lng) / 2
+        )),
+          (this.polyline = {
+            latlngs: [
+              [polyLineStart.latLng().lat, polyLineStart.latLng().lng],
+              [polyLineEnd.latLng().lat, polyLineEnd.latLng().lng],
+            ],
+            color: "red",
+          });
+      }
+    }
   },
 };
 </script>

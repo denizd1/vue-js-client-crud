@@ -2,7 +2,7 @@
   <v-app>
     <header style="padding-bottom: 100px">
       <nav
-        class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark"
+        class="navbar navbar-expand-lg navbar-light fixed-top bg-light"
         style="z-index: 99"
       >
         <div class="container-fluid">

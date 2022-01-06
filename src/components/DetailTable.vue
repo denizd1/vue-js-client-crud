@@ -1,7 +1,7 @@
 <template>
   <table class="table table-hover table-sm">
-    <tbody>
-      <tr v-if="currentTutorial.nokta_adi">
+    <tbody v-if="currentTutorial">
+      <!-- <tr v-if="currentTutorial.nokta_adi">
         <td>Nokta Adı</td>
         <td>{{ currentTutorial.nokta_adi }}</td>
       </tr>
@@ -32,10 +32,6 @@
       <tr v-if="currentTutorial.proje_kodu">
         <td>Proje Kodu</td>
         <td>{{ currentTutorial.proje_kodu }}</td>
-      </tr>
-      <tr v-if="currentTutorial.rapor_no">
-        <td>Rapor No</td>
-        <td>{{ currentTutorial.rapor_no }}</td>
       </tr>
       <tr v-if="currentTutorial.kuyu_arsiv_no">
         <td>Kuyu Arşiv No</td>
@@ -297,9 +293,38 @@
         <td>A4</td>
         <td>{{ currentTutorial.a_4 }}</td>
       </tr>
+      <tr v-if="currentTutorial.olcu_karne_no">
+        <td>Ölçü Karne No</td>
+        <td>{{ currentTutorial.olcu_karne_no }}</td>
+      </tr>
       <tr v-if="currentTutorial.dis_loop_boyutu">
         <td>Dış Loop Boyutu</td>
         <td>{{ currentTutorial.dis_loop_boyutu }}</td>
+      </tr> -->
+      <tr v-for="(val, key, index) in currentTutorial" :key="index">
+        <td
+          v-if="
+            val &&
+            index !== 0 &&
+            index !== Object.keys(currentTutorial).length - 1 &&
+            index !== Object.keys(currentTutorial).length - 2
+          "
+        >
+          {{
+            key.replace(/_/g, " ").charAt(0).toUpperCase() +
+            key.replace(/_/g, " ").slice(1)
+          }}
+        </td>
+        <td
+          v-if="
+            val &&
+            index !== 0 &&
+            index !== Object.keys(currentTutorial).length - 1 &&
+            index !== Object.keys(currentTutorial).length - 2
+          "
+        >
+          {{ val }}
+        </td>
       </tr>
     </tbody>
   </table>
@@ -309,5 +334,15 @@
 export default {
   name: "DetailTable",
   props: ["currentTutorial"],
+  // beforeMount() {
+  //   jsondat = this.currentTutorial.jsonData
+  //   for (var key in jsondat) {
+
+  //           if(jsondat[key]){
+
+  //           }
+  //         }
+
+  // }
 };
 </script>
