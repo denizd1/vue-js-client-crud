@@ -7,8 +7,10 @@
       <div class="col-8" style="z-index: 4">
         <map-view :currentTutorial="currentTutorial"></map-view>
       </div>
+      <!-- <v-card-actions style="z-index: 99">
+        <v-btn color="success" @click="print">Yazdir</v-btn>
+      </v-card-actions> -->
     </div>
-    <p class="mt-3">{{ message }}</p>
   </div>
   <!-- <div v-else>
       Yukleniyor
@@ -26,7 +28,7 @@ export default {
   data() {
     return {
       currentTutorial: null,
-      message: "",
+      // output: null,
     };
   },
   components: {
@@ -34,6 +36,10 @@ export default {
     MapView,
   },
   methods: {
+    // async print() {
+    //   // Pass the element id here
+    //   await this.$htmlToPaper("printContent");
+    // },
     getTutorial(id) {
       TutorialDataService.get(id)
         .then((response) => {

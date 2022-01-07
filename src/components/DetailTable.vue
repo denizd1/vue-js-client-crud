@@ -310,10 +310,7 @@
             index !== Object.keys(currentTutorial).length - 2
           "
         >
-          {{
-            key.replace(/_/g, " ").charAt(0).toUpperCase() +
-            key.replace(/_/g, " ").slice(1)
-          }}
+          {{ headers[index] }}
         </td>
         <td
           v-if="
@@ -334,15 +331,90 @@
 export default {
   name: "DetailTable",
   props: ["currentTutorial"],
-  // beforeMount() {
-  //   jsondat = this.currentTutorial.jsonData
-  //   for (var key in jsondat) {
-
-  //           if(jsondat[key]){
-
-  //           }
-  //         }
-
-  // }
+  data() {
+    return {
+      headers: [
+        "",
+        "Nokta/Kuyu/Profil Adı",
+        "Yöntem",
+        "Alt Yöntem",
+        "Çalışma Amacı",
+        "Satılabilirlik",
+        "Ham Veri",
+        "Çalışma Tarihi",
+        "Proje Kodu",
+        "Kuyu Arşiv No",
+        "Jeofizik Arşiv No",
+        "Derleme No",
+        "CD No",
+        "İl",
+        "İlçe",
+        "x",
+        "y",
+        "z",
+        "Profil Başlangıç (x)",
+        "Profil Başlangıç (y)",
+        "Profil Bitiş (x)",
+        "Profil Bitiş (y)",
+        "Zone",
+        "Datum",
+        "1/500000",
+        "1/100000",
+        "1/25000",
+        "Ölçülen Parametre(ler)",
+        "Açılım Yönü",
+        "Açılım Yöntemi",
+        "Frekans Aralığı",
+        "MT Ölçü Süresi (saat)",
+        "Z Bileşeni",
+        "AMT Ölçüsü",
+        "AMT Ölçü Süresi",
+        "TEM Ölçüsü",
+        "Kalibrasyon Dosyası",
+        "Veri Formatı",
+        "Derinlik (m) - AB/2 (m)",
+        "Derinlik (m) GR",
+        "Derinlik (m) NEU",
+        "Derinlik (m) DEN",
+        "Derinlik (m) RES",
+        "Derinlik (m) SP",
+        "Derinlik (m) CAL",
+        "Derinlik (m) TERM",
+        "Derinlik (m) SGR",
+        "Derinlik (m) CBL",
+        "Derinlik (m) SON",
+        "Derinlik (m) CCL",
+        "Hat Boyu (m)",
+        "Kayıt Boyu (sn)",
+        "Sweep Süresi (sn)",
+        "Sweep Tipi",
+        "Sweep Sayısı",
+        "Sweep Frekansları (hz)",
+        "Sweep Taper (ms)",
+        "Yayım Tipi",
+        "Offset (m)",
+        "Jeofon Dizilimi",
+        "Grup Aralığı (m)",
+        "Atış Aralığı (m)",
+        "Örnekleme Aralığı (ms)",
+        "Ekipman",
+        "Enerji Kaynağı",
+        "Km^2",
+        "Profil Boyu (km)",
+        "Elektrot Aralığı",
+        "Dizilim Türü",
+        "Seviye Sayısı",
+        "Profil Aralığı",
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "Ölçü Karne No",
+        "Dış Loop Boyutu",
+        "",
+        "",
+      ],
+    };
+  },
 };
 </script>
