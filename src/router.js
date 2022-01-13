@@ -46,7 +46,12 @@ export const router = new Router({
       path: '/profile',
       name: 'profile',
       // lazy-loaded
-      component: () => import('./views/Profile.vue')
+      component: () => import('./views/Profile')
+    },
+    {
+      path: '/turkey-map',
+      name: "turkey-map",
+      component: () => import('./components/TurkeyMap')
     },
     // {
     //   path: '/admin',

@@ -171,4 +171,18 @@ export default {
 .mta-logo {
   width: 50px;
 }
+/* .particle-wrap:before {
+  content: " ";
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  background-image: url("https://logowik.com/content/uploads/images/742_mta.jpg");
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 40%;
+} */
 </style>

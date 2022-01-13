@@ -17,14 +17,17 @@
         :lat-lngs="polyline.latlngs"
         :color="polyline.color"
       />
+      <l-geo-json :geojson="geojson" />
     </l-map>
   </div>
 </template>
 
 <script>
+import "leaflet/dist/leaflet.css";
+import http from "../http-common";
 import { latLng } from "leaflet";
 import "leaflet.utm";
-import { LMap, LTileLayer, LMarker, LPolyline } from "vue2-leaflet";
+import { LMap, LTileLayer, LMarker, LPolyline, LGeoJson } from "vue2-leaflet";
 import { Icon } from "leaflet";
 import * as L from "leaflet";
 delete Icon.Default.prototype._getIconUrl;
@@ -42,11 +45,23 @@ export default {
     LTileLayer,
     LMarker,
     LPolyline,
+    LGeoJson,
   },
   data() {
     return {
       withTooltip: null,
       polyline: null,
+      zoom: 11.5,
+      loading: false,
+      url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+      attribution:
+        'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+      currentZoom: 11.5,
+      mapOptions: {
+        zoomSnap: 0.5,
+      },
+      geojson: null,
+      showMap: true,
     };
   },
   methods: {
@@ -58,16 +73,6 @@ export default {
     },
   },
   beforeMount() {
-    (this.zoom = 11.5),
-      (this.url = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"),
-      (this.attribution =
-        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'),
-      (this.currentZoom = 11.5),
-      (this.showParagraph = false),
-      (this.mapOptions = {
-        zoomSnap: 0.5,
-      }),
-      (this.showMap = true);
     if (this.currentTutorial.datum == "WGS_84") {
       if (this.currentTutorial.x && this.currentTutorial.y) {
         var pointIcon = L.utm({
@@ -122,6 +127,14 @@ export default {
           });
       }
     }
+  },
+  async created() {
+    this.loading = true;
+    const response = await http.get("/getGeoJson");
+
+    const data = await response.data;
+    this.geojson = data;
+    this.loading = false;
   },
 };
 </script>

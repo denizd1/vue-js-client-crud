@@ -4,7 +4,6 @@ import vuetify from './plugins/vuetify'
 import { router } from './router'
 import VueParticles from 'vue-particles'
 // import 'bootstrap/dist/css/bootstrap.css'
-import 'leaflet/dist/leaflet.css';
 import store from './store';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,23 +21,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import setupInterceptors from './services/setupInterceptors';
-import VueHtmlToPaper from 'vue-html-to-paper';
-
-const options = {
-  name: '_blank',
-  specs: [
-    'fullscreen=yes',
-    'titlebar=yes',
-    'scrollbars=yes'
-  ],
-  styles: [
-    'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
-    'https://unpkg.com/kidlat-css/css/kidlat.css'
-  ],
-  timeout: 1000, // default timeout before the print window appears
-  autoClose: false, // if false, the window will not close after printing
-  windowTitle: window.document.title, // override the window title
-}
 
 
 
@@ -50,7 +32,6 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(VueParticles);
 Vue.use(Vuex);
 Vue.use(VeeValidate);
-Vue.use(VueHtmlToPaper, options);
 
 setupInterceptors(store);
 
