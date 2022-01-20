@@ -108,9 +108,7 @@
         :linesDistance="150"
         :moveSpeed="3"
         :hoverEffect="false"
-        hoverMode="grab"
         :clickEffect="false"
-        clickMode="push"
       >
       </vue-particles>
     </v-main>

@@ -5,6 +5,10 @@ class TutorialDataService {
     return http.get("/tutorials", { params });
   }
 
+  findAllgetAll(params) {
+    return http.get("/tutorials/getall", { params });
+  }
+
   get(id) {
     return http.get(`/tutorials/${id}`);
   }

@@ -48,11 +48,6 @@ export const router = new Router({
       // lazy-loaded
       component: () => import('./views/Profile')
     },
-    {
-      path: '/turkey-map',
-      name: "turkey-map",
-      component: () => import('./components/TurkeyMap')
-    },
     // {
     //   path: '/admin',
     //   name: 'admin',

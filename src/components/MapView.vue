@@ -17,17 +17,26 @@
         :lat-lngs="polyline.latlngs"
         :color="polyline.color"
       />
-      <l-geo-json :geojson="geojson" />
+      <l-control-scale
+        position="topright"
+        :imperial="false"
+        :metric="true"
+      ></l-control-scale>
     </l-map>
   </div>
 </template>
 
 <script>
 import "leaflet/dist/leaflet.css";
-import http from "../http-common";
 import { latLng } from "leaflet";
 import "leaflet.utm";
-import { LMap, LTileLayer, LMarker, LPolyline, LGeoJson } from "vue2-leaflet";
+import {
+  LMap,
+  LTileLayer,
+  LMarker,
+  LPolyline,
+  LControlScale,
+} from "vue2-leaflet";
 import { Icon } from "leaflet";
 import * as L from "leaflet";
 delete Icon.Default.prototype._getIconUrl;
@@ -45,7 +54,7 @@ export default {
     LTileLayer,
     LMarker,
     LPolyline,
-    LGeoJson,
+    LControlScale,
   },
   data() {
     return {
@@ -60,7 +69,6 @@ export default {
       mapOptions: {
         zoomSnap: 0.5,
       },
-      geojson: null,
       showMap: true,
     };
   },
@@ -128,13 +136,13 @@ export default {
       }
     }
   },
-  async created() {
-    this.loading = true;
-    const response = await http.get("/getGeoJson");
+  // async created() {
+  //   this.loading = true;
+  //   const response = await http.get("/getGeoJson");
 
-    const data = await response.data;
-    this.geojson = data;
-    this.loading = false;
-  },
+  //   const data = await response.data;
+  //   this.geojson = data;
+  //   this.loading = false;
+  // },
 };
 </script>

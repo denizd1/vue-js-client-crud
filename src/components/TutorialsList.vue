@@ -1,96 +1,108 @@
 <template>
-  <div class="container">
-    <v-row align="center" class="list px-3 mx-auto">
-      <v-col cols="12" md="8">
-        <v-text-field
-          v-model="searchTitle"
-          label="Nokta Adı ile Ara"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" sm="4">
-        <v-btn
-          small
-          @click="
-            page = 1;
-            retrieveTutorials();
-          "
-        >
-          Ara
-        </v-btn>
-      </v-col>
-      <search-detail></search-detail>
-      <v-col cols="12" sm="12">
-        <v-row>
-          <v-col cols="4" sm="3">
-            <v-select
-              v-model="pageSize"
-              :items="pageSizes"
-              label="Öğe Sayısı"
-              @change="handlePageSizeChange"
-            ></v-select>
-          </v-col>
-
-          <v-col cols="12" sm="9">
-            <v-pagination
-              v-model="page"
-              :length="totalPages"
-              total-visible="7"
-              next-icon="mdi-menu-right"
-              prev-icon="mdi-menu-left"
-              @input="handlePageChange"
-            ></v-pagination>
-          </v-col>
+  <v-container>
+    <v-row>
+      <v-col cols="12" class="p-0">
+        <v-row align="center" class="list px-3 mx-auto">
+          <v-tabs centered v-model="tab">
+            <v-tab href="#listView">Liste Görünümü</v-tab>
+            <v-tab href="#mapView">Harita Görünümü</v-tab>
+          </v-tabs>
         </v-row>
-      </v-col>
+        <v-tabs-items v-model="tab">
+          <v-tab-item :key="1" value="listView" :eager="true">
+            <v-row align="center" class="list px-3 mx-auto">
+              <!-- <v-col></v-col> -->
+              <v-col cols="12" md="8">
+                <v-text-field
+                  v-model="searchTitle"
+                  label="Nokta Adı ile Ara"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="4">
+                <v-btn small @click="handlePageChange"> Ara </v-btn>
+              </v-col>
+              <!-- <search-detail></search-detail> -->
+              <v-col cols="12" sm="12">
+                <v-row>
+                  <v-col cols="4" sm="3">
+                    <v-select
+                      v-model="pageSize"
+                      :items="pageSizes"
+                      label="Öğe Sayısı"
+                      @change="handlePageSizeChange"
+                    ></v-select>
+                  </v-col>
 
-      <v-col cols="12" sm="12">
-        <v-card class="mx-auto" tile>
-          <v-card-title>Projeler</v-card-title>
+                  <v-col cols="12" sm="9">
+                    <v-pagination
+                      v-model="page"
+                      :length="totalPages"
+                      total-visible="7"
+                      next-icon="mdi-menu-right"
+                      prev-icon="mdi-menu-left"
+                      @input="handlePageChange"
+                    ></v-pagination>
+                  </v-col>
+                </v-row>
+              </v-col>
 
-          <v-data-table
-            :headers="headers"
-            :items="tutorials"
-            disable-pagination
-            :hide-default-footer="true"
-            @click:row="handleClick"
-            class="row-pointer"
-          >
-            <template
-              v-if="isModerator || isAdmin"
-              v-slot:[`item.actions`]="{ item }"
-            >
-              <v-icon
-                v-bind:style="[
-                  isModerator ? { left: '25%' } : { left: 'auto' },
-                ]"
-                small
-                class="mr-2"
-                @click.stop.prevent="editTutorial(item.id)"
-                >mdi-pencil</v-icon
-              >
-              <v-icon
-                v-if="isAdmin"
-                small
-                @click.stop.prevent="deleteTutorial(item.id)"
-                >mdi-delete</v-icon
-              >
-            </template>
-          </v-data-table>
+              <v-col cols="12" sm="12">
+                <v-card class="mx-auto" tile>
+                  <v-card-title>Projeler</v-card-title>
 
-          <!-- <v-card-actions v-if="tutorials.length > 0">
+                  <v-data-table
+                    :headers="headers"
+                    :items="tutorials"
+                    disable-pagination
+                    :hide-default-footer="true"
+                    @click:row="handleClick"
+                    class="row-pointer mb-2"
+                    :key="componentKey"
+                  >
+                    <template
+                      v-if="isModerator || isAdmin"
+                      v-slot:[`item.actions`]="{ item }"
+                    >
+                      <v-icon
+                        v-bind:style="[
+                          isModerator ? { left: '25%' } : { left: 'auto' },
+                        ]"
+                        small
+                        class="mr-2"
+                        @click.stop.prevent="editTutorial(item.id)"
+                        >mdi-pencil</v-icon
+                      >
+                      <v-icon
+                        v-if="isAdmin"
+                        small
+                        @click.stop.prevent="deleteTutorial(item.id)"
+                        >mdi-delete</v-icon
+                      >
+                    </template>
+                  </v-data-table>
+
+                  <!-- <v-card-actions v-if="tutorials.length > 0">
           <v-btn small color="error" @click="removeAllTutorials">
             Remove All
           </v-btn>
         </v-card-actions> -->
-        </v-card>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-tab-item>
+          <v-tab-item :key="2" value="mapView">
+            <turkey-map @searchParam="getSelectedcity"></turkey-map>
+          </v-tab-item>
+        </v-tabs-items>
       </v-col>
     </v-row>
-  </div>
+  </v-container>
 </template>
 
 <script>
 import TutorialDataService from "../services/TutorialDataService";
-import SearchDetail from "./SearchDetail.vue";
+// import SearchDetail from "./SearchDetail.vue";
+import TurkeyMap from "./TurkeyMap.vue";
 
 export default {
   name: "tutorials-list",
@@ -101,12 +113,14 @@ export default {
       page: 1,
       totalPages: 0,
       pageSize: 5,
-
       pageSizes: [5, 10, 15],
+      selectedCity: null,
+      componentKey: 0,
     };
   },
   components: {
-    SearchDetail,
+    // SearchDetail,
+    TurkeyMap,
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -118,6 +132,14 @@ export default {
     });
   },
   computed: {
+    tab: {
+      set(tab) {
+        this.$router.replace({ query: { ...this.$route.query, tab } });
+      },
+      get() {
+        return this.$route.query.tab;
+      },
+    },
     currentUser() {
       return this.$store.state.auth.user;
     },
@@ -136,7 +158,7 @@ export default {
     headers() {
       const headers = [
         {
-          text: "Nokta Adı",
+          text: "Nokta/Kuyu/Profil Adı",
           value: "nokta_adi",
           align: "start",
           sortable: false,
@@ -155,12 +177,31 @@ export default {
       return headers;
     },
   },
+  watch: {
+    selectedCity: {
+      handler: function (selectedCity) {
+        if (selectedCity !== null) {
+          this.page = 1;
+          this.retrieveTutorials();
+          this.componentKey += 1;
+        }
+      },
+      immediate: true,
+    },
+  },
   methods: {
+    getSelectedcity(val) {
+      this.selectedCity = val;
+      // console.log(this.selectedCity);
+    },
     getRequestParams(searchTitle, page, pageSize) {
       let params = {};
-
+      if (this.selectedCity != null) {
+        searchTitle = this.selectedCity;
+        this.searchTitle = this.selectedCity;
+      }
       if (searchTitle) {
-        params["nokta_adi"] = searchTitle;
+        params["il"] = searchTitle;
       }
 
       if (page) {
@@ -174,7 +215,7 @@ export default {
       return params;
     },
     retrieveTutorials() {
-      const params = this.getRequestParams(
+      var params = this.getRequestParams(
         this.searchTitle,
         this.page,
         this.pageSize
@@ -185,8 +226,6 @@ export default {
           const { tutorials, totalPages } = response.data;
           this.tutorials = tutorials.map(this.getDisplayTutorial);
           this.totalPages = totalPages;
-
-          console.log(response.data);
         })
         .catch((e) => {
           console.log(e);
