@@ -35,15 +35,29 @@
           @update:center="centerUpdate"
           @update:zoom="zoomUpdate"
         >
+          <v-icondefault></v-icondefault>
           <l-tile-layer :url="url" :attribution="attribution" />
-          <l-feature-group>
-            <l-marker v-if="withTooltip != null" :lat-lng="withTooltip" />
-            <l-polyline
-              v-if="polyline != null"
-              :lat-lngs="polyline.latlngs"
-              :color="polyline.color"
-            />
-          </l-feature-group>
+          <!-- <l-marker
+            ref="marker"
+            v-if="withTooltip != null"
+            :lat-lng="withTooltip"
+          /> -->
+          <v-marker-cluster>
+            <v-marker
+              v-for="marker in markers"
+              :key="marker.id"
+              :lat-lng="marker.latlng"
+              :icon="icon"
+            >
+              <v-popup :content="marker.text"></v-popup>
+            </v-marker>
+          </v-marker-cluster>
+          <l-polyline
+            v-for="(line, index) in polyline"
+            :key="index"
+            :lat-lngs="line.latlngs"
+            :color="line.color"
+          />
 
           <l-geo-json
             v-if="showGeojson"
@@ -56,6 +70,11 @@
             :imperial="false"
             :metric="true"
           ></l-control-scale>
+          <!-- <l-control v-if="showButton" position="bottomleft">
+            <v-btn depressed elevation="2" small @click="resetZoom"
+              >Haritaya Geri Dön</v-btn
+            >
+          </l-control> -->
         </l-map>
       </v-col>
     </v-row>
@@ -63,9 +82,7 @@
 </template>
 
 <script>
-import "leaflet/dist/leaflet.css";
-import { latLng } from "leaflet";
-import "leaflet.utm";
+import Vue2LeafletMarkerCluster from "vue2-leaflet-markercluster";
 import TutorialDataService from "../services/TutorialDataService";
 import {
   LMap,
@@ -74,13 +91,19 @@ import {
   LMarker,
   LPolyline,
   LControlScale,
-  LFeatureGroup,
+  // LControl,
+  LIconDefault,
+  LPopup,
 } from "vue2-leaflet";
+import { ProfilePlotter } from "../common/ProfilePlotter.js";
 import http from "../http-common";
-import { Icon } from "leaflet";
-import * as L from "leaflet";
+import { Icon, icon } from "leaflet";
+
 import citiesLatLongjson from "../data/cities_of_turkey.json";
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 delete Icon.Default.prototype._getIconUrl;
+
 Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
   iconUrl: require("leaflet/dist/images/marker-icon.png"),
@@ -91,24 +114,28 @@ function onEachFeature(feature, layer) {
   var v = this;
   if (feature.properties.mytag && feature.properties.mytag == "Cities") {
     layer.on("click", function (e) {
+      document.querySelectorAll(".leaflet-interactive").forEach((el) => {
+        el.classList.add("pseudoClass");
+      });
       document
         .querySelectorAll(".selected")
         .forEach((el) => el.classList.remove("selected"));
       e.originalEvent.target.classList.add("selected");
+      e.originalEvent.target.classList.remove("pseudoClass");
       v.$emit("searchParam", this.feature.properties.name);
       v.dataService(this.feature.properties.name);
     });
     layer.on("mouseover", function (e) {
       document
-        .querySelectorAll(".hoverstyle")
-        .forEach((el) => el.classList.remove("hoverstyle"));
-      e.originalEvent.target.classList.add("hoverstyle");
+        .querySelectorAll(".pseudoClass")
+        .forEach((el) => el.classList.remove("pseudoClass"));
+      e.originalEvent.target.classList.add("pseudoClass");
     });
     layer.on("mouseout", function (e) {
       document
-        .querySelectorAll(".hoverstyle")
-        .forEach((el) => el.classList.remove("hoverstyle"));
-      e.originalEvent.target.classList.add("hoverstyle");
+        .querySelectorAll(".pseudoClass")
+        .forEach((el) => el.classList.remove("pseudoClass"));
+      e.originalEvent.target.classList.add("pseudoClass");
     });
   }
 }
@@ -117,17 +144,25 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    LMarker,
     LPolyline,
     LGeoJson,
     LControlScale,
-    LFeatureGroup,
+    // LControl,
+    "v-marker-cluster": Vue2LeafletMarkerCluster,
+    "v-marker": LMarker,
+    "v-icondefault": LIconDefault,
+    "v-popup": LPopup,
   },
   data() {
+    let customicon = icon(
+      Object.assign({}, Icon.Default.prototype.options, { iconUrl, shadowUrl })
+    );
     return {
-      withTooltip: null,
-      polyline: null,
+      icon: customicon,
+      // showButton: false,
+      polyline: [],
       responseData: null,
+      markers: [],
       colorScale: ["e7d090", "e9ae7b", "de7062"],
       citiesLatLongjson: citiesLatLongjson,
       zoom: 6,
@@ -145,6 +180,7 @@ export default {
       showGeojson: false,
       searchParam: null,
       options: { onEachFeature: onEachFeature.bind(this) },
+      //Farkli geojsonlar icin gereken parametreler
       scaleControls: [
         {
           id: 1,
@@ -183,55 +219,32 @@ export default {
     };
   },
   methods: {
+    //haritaya geri donunce zoomu resetler
+    // resetZoom() {
+    //   (this.zoom = 6), (this.center = [39.750359, 37.015598]);
+    //   setTimeout(() => (this.showButton = false), 100);
+    // },
+    //secilen ile gore projeleri getiren servisi cagirir
     dataService(val) {
       let params = {};
+      this.polyline = [];
+      this.markers = [];
       params["il"] = val;
       TutorialDataService.findAllgetAll(params)
         .then((response) => {
           this.responseData = response.data;
+
           this.citiesLatLongjson.filter((elem) => {
             if (val === elem.il) {
-              this.center = [elem.latitude, elem.longitude];
-              this.zoom = 7.5;
+              // this.center = [elem.latitude, elem.longitude];
+              // this.zoom = 7.8;
               for (let i = 0; i < this.responseData.length; i++) {
-                var datum = this.responseData[i].datum
-                  ? this.responseData[i].datum
-                  : null;
-                var project_zone = this.responseData[i].zone
-                  ? this.responseData[i].zone
-                  : null;
-                var project_x = this.responseData[i].x
-                  ? this.responseData[i].x
-                  : null;
-                var project_y = this.responseData[i].y
-                  ? this.responseData[i].y
-                  : null;
-                var profil_baslangic_x = this.responseData[i].profil_baslangic_x
-                  ? this.responseData[i].profil_baslangic_x
-                  : null;
-                var profil_baslangic_y = this.responseData[i].profil_baslangic_y
-                  ? this.responseData[i].profil_baslangic_y
-                  : null;
-                var profil_bitis_x = this.responseData[i].profil_bitis_x
-                  ? this.responseData[i].profil_bitis_x
-                  : null;
-                var profil_bitis_y = this.responseData[i].profil_bitis_y
-                  ? this.responseData[i].profil_bitis_y
-                  : null;
-
-                this.plotProfile(
-                  datum,
-                  project_zone,
-                  project_x,
-                  project_y,
-                  profil_baslangic_x,
-                  profil_baslangic_y,
-                  profil_bitis_x,
-                  profil_bitis_y
-                );
+                //profileplotter.js ile nokta ve profilleri cizmek icin
+                this.triggerExternalplot(this.responseData[i]);
               }
             }
           });
+          // this.showButton = true;
         })
         .catch((e) => {
           console.log(e);
@@ -243,9 +256,11 @@ export default {
     centerUpdate(center) {
       this.currentCenter = center;
     },
+    //farkli olceklerde parsel geojsonlari ve sehir geojsoni getirmek icin (checkbox change)
     changeScale(ev, checked, val) {
-      this.center = [39.750359, 37.015598];
-      this.zoom = 6;
+      // this.showButton = false;
+      // this.center = [39.750359, 37.015598];
+      // this.zoom = 6;
       if (checked === false) {
         this.showGeojson = false;
         this.preventDefault();
@@ -258,74 +273,24 @@ export default {
         this.scaleService(val);
       }
     },
-    plotProfile(
-      datum,
-      project_zone,
-      project_x,
-      project_y,
-      profil_baslangic_x,
-      profil_baslangic_y,
-      profil_bitis_x,
-      profil_bitis_y
-    ) {
-      console.log(
-        datum,
-        project_zone,
-        project_x,
-        project_y,
-        profil_baslangic_x,
-        profil_baslangic_y,
-        profil_bitis_x,
-        profil_bitis_y
-      );
-      if (datum == "WGS_84") {
-        if (project_x && project_y) {
-          var pointIcon = L.utm({
-            x: project_x,
-            y: project_y,
-            zone: project_zone ? project_zone : 0,
-            southHemi: false,
-          });
+    triggerExternalplot(currentTutorial) {
+      var params = ProfilePlotter(currentTutorial);
+      if (params.polyline !== null) {
+        this.polyline.push(params.polyline);
+      }
 
-          (this.withTooltip = latLng(
-            pointIcon.latLng().lat,
-            pointIcon.latLng().lng
-          )),
-            (this.withTooltip = latLng(
-              pointIcon.latLng().lat,
-              pointIcon.latLng().lng
-            ));
-        }
-        if (
-          profil_baslangic_x &&
-          profil_baslangic_y &&
-          profil_bitis_x &&
-          profil_bitis_y
-        ) {
-          var polyLineStart = L.utm({
-            x: profil_baslangic_x,
-            y: profil_baslangic_y,
-            zone: project_zone ? project_zone : 0,
-            southHemi: false,
-          });
-          var polyLineEnd = L.utm({
-            x: profil_bitis_x,
-            y: profil_bitis_y,
-            zone: project_zone ? project_zone : 0,
-            southHemi: false,
-          });
-          console.log(polyLineStart, polyLineStart.latLng().lat);
-          this.polyline = {
-            latlngs: [
-              [polyLineStart.latLng().lat, polyLineStart.latLng().lng],
-              [polyLineEnd.latLng().lat, polyLineEnd.latLng().lng],
-            ],
-            color: "red",
-          };
-        }
+      // this.center = params.center;
+      // this.currentCenter = params.currentCenter;
+      // console.log(params.withTooltip);
+      if (params.markerLatlong !== null) {
+        this.markers.push({
+          id: params.id,
+          latlng: params.markerLatlong,
+          text: params.text,
+        });
       }
     },
-
+    //asenkron geojson servisi. (checkbox change)
     async scaleService(val) {
       this.loading = true;
       const response = await http.get(`/getGeoJson${val}`);
@@ -372,10 +337,16 @@ export default {
 };
 </script>
 <style>
+@import "~leaflet.markercluster/dist/MarkerCluster.css";
+@import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
+@import "~leaflet/dist/leaflet.css";
 .selected {
-  fill: #231fd6;
+  fill-opacity: 0;
 }
-.hoverstyle {
+/* .hoverstyle {
   fill: #ca3d3d;
+} */
+.pseudoClass {
+  fill: #95ffff;
 }
 </style>

@@ -11,7 +11,7 @@
     >
       <l-tile-layer :url="url" :attribution="attribution" />
 
-      <l-marker v-if="withTooltip" :lat-lng="withTooltip" />
+      <l-marker v-if="markerLatlong" :lat-lng="markerLatlong" />
       <l-polyline
         v-if="polyline"
         :lat-lngs="polyline.latlngs"
@@ -28,8 +28,6 @@
 
 <script>
 import "leaflet/dist/leaflet.css";
-import { latLng } from "leaflet";
-import "leaflet.utm";
 import {
   LMap,
   LTileLayer,
@@ -38,7 +36,8 @@ import {
   LControlScale,
 } from "vue2-leaflet";
 import { Icon } from "leaflet";
-import * as L from "leaflet";
+import { ProfilePlotter } from "../common/ProfilePlotter.js";
+// import * as L from "leaflet";
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -58,7 +57,7 @@ export default {
   },
   data() {
     return {
-      withTooltip: null,
+      markerLatlong: null,
       polyline: null,
       zoom: 11.5,
       loading: false,
@@ -79,62 +78,67 @@ export default {
     centerUpdate(center) {
       this.currentCenter = center;
     },
+    triggerExternalplot(currentTutorial) {
+      var params = ProfilePlotter(currentTutorial);
+      (this.center = params.center),
+        (this.currentCenter = params.currentCenter),
+        (this.markerLatlong = params.markerLatlong),
+        (this.polyline = params.polyline);
+    },
   },
   beforeMount() {
-    if (this.currentTutorial.datum == "WGS_84") {
-      if (this.currentTutorial.x && this.currentTutorial.y) {
-        var pointIcon = L.utm({
-          x: this.currentTutorial.x,
-          y: this.currentTutorial.y,
-          zone: this.currentTutorial.zone ? this.currentTutorial.zone : 0,
-          southHemi: false,
-        });
-        (this.center = latLng(pointIcon.latLng().lat, pointIcon.latLng().lng)),
-          (this.withTooltip = latLng(
-            pointIcon.latLng().lat,
-            pointIcon.latLng().lng
-          )),
-          (this.currentCenter = latLng(
-            pointIcon.latLng().lat,
-            pointIcon.latLng().lng
-          ));
-
-        this.withTooltip = latLng(
-          pointIcon.latLng().lat,
-          pointIcon.latLng().lng
-        );
-      }
-      if (
-        this.currentTutorial.profil_baslangic_x &&
-        this.currentTutorial.profil_baslangic_y &&
-        this.currentTutorial.profil_bitis_x &&
-        this.currentTutorial.profil_bitis_y
-      ) {
-        var polyLineStart = L.utm({
-          x: this.currentTutorial.profil_baslangic_x,
-          y: this.currentTutorial.profil_baslangic_y,
-          zone: this.currentTutorial.zone ? this.currentTutorial.zone : 0,
-          southHemi: false,
-        });
-        var polyLineEnd = L.utm({
-          x: this.currentTutorial.profil_bitis_x,
-          y: this.currentTutorial.profil_bitis_y,
-          zone: this.currentTutorial.zone ? this.currentTutorial.zone : 0,
-          southHemi: false,
-        });
-        (this.center = latLng(
-          (polyLineStart.latLng().lat + polyLineEnd.latLng().lat) / 2,
-          (polyLineStart.latLng().lng + polyLineEnd.latLng().lng) / 2
-        )),
-          (this.polyline = {
-            latlngs: [
-              [polyLineStart.latLng().lat, polyLineStart.latLng().lng],
-              [polyLineEnd.latLng().lat, polyLineEnd.latLng().lng],
-            ],
-            color: "red",
-          });
-      }
+    {
+      this.triggerExternalplot(this.currentTutorial);
     }
+    // var utm = null;
+    // if (this.currentTutorial.datum == "WGS_84") {
+    //   utm = new utmObj("WGS 84");
+    // }
+    // if (this.currentTutorial.datum == "ED_50") {
+    //   utm = new utmObj("ED50");
+    // }
+    // if (this.currentTutorial.x && this.currentTutorial.y) {
+    //   var pointIcon = utm.convertUtmToLatLng(
+    //     this.currentTutorial.x,
+    //     this.currentTutorial.y,
+    //     this.currentTutorial.zone,
+    //     "N"
+    //   );
+    //   (this.center = latLng(pointIcon.lat, pointIcon.lng)),
+    //     (this.withTooltip = latLng(pointIcon.lat, pointIcon.lng)),
+    //     (this.currentCenter = latLng(pointIcon.lat, pointIcon.lng));
+    // }
+    // if (
+    //   this.currentTutorial.profil_baslangic_x &&
+    //   this.currentTutorial.profil_baslangic_y &&
+    //   this.currentTutorial.profil_bitis_x &&
+    //   this.currentTutorial.profil_bitis_y
+    // ) {
+    //   var polyLineStart = utm.convertUtmToLatLng(
+    //     this.currentTutorial.profil_baslangic_x,
+    //     this.currentTutorial.profil_baslangic_y,
+    //     this.currentTutorial.zone,
+    //     "N"
+    //   );
+    //   var polyLineEnd = utm.convertUtmToLatLng(
+    //     this.currentTutorial.profil_bitis_x,
+    //     this.currentTutorial.profil_bitis_y,
+    //     this.currentTutorial.zone,
+    //     "N"
+    //   );
+
+    //   (this.center = latLng(
+    //     (polyLineStart.lat + polyLineEnd.lat) / 2,
+    //     (polyLineStart.lng + polyLineEnd.lng) / 2
+    //   )),
+    //     (this.polyline = {
+    //       latlngs: [
+    //         [polyLineStart.lat, polyLineStart.lng],
+    //         [polyLineEnd.lat, polyLineEnd.lng],
+    //       ],
+    //       color: "red",
+    //     });
+    // }
   },
   // async created() {
   //   this.loading = true;
