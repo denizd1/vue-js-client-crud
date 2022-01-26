@@ -28,7 +28,6 @@ export default {
   data() {
     return {
       currentTutorial: null,
-      // output: null,
     };
   },
   components: {
@@ -36,15 +35,10 @@ export default {
     MapView,
   },
   methods: {
-    // async print() {
-    //   // Pass the element id here
-    //   await this.$htmlToPaper("printContent");
-    // },
     getTutorial(id) {
       TutorialDataService.get(id)
         .then((response) => {
           this.currentTutorial = response.data;
-          // console.log(response.data);
         })
         .catch((e) => {
           console.log(e);
@@ -60,10 +54,6 @@ export default {
       }
     });
   },
-  // mounted() {
-  //   this.message = "";
-  //   this.getTutorial(this.$route.params.id);
-  // },
 };
 </script>
 

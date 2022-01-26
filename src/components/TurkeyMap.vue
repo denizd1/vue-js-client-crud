@@ -9,7 +9,7 @@
         <v-row>
           <v-col cols="12" md="6">
             <v-checkbox
-              class="float-left mr-2 mt-0"
+              class="float-left mr-2 mt-0 shrink"
               style="z-index: 89"
               v-for="(scaleControl, index) in scaleControls"
               :key="index"
@@ -48,8 +48,13 @@
               :key="marker.id"
               :lat-lng="marker.latlng"
               :icon="icon"
+              :class="$style.baz"
             >
-              <v-popup :content="marker.text"></v-popup>
+              <v-popup>
+                <button @click="handlePopupClick(marker.id)">
+                  {{ marker.text }}
+                </button>
+              </v-popup>
             </v-marker>
           </v-marker-cluster>
           <l-polyline
@@ -65,6 +70,21 @@
             :options="options"
             :options-style="styleFunction"
           />
+          <l-control style="display: none" :position="'bottomleft'">
+            <div class="legend">
+              <v-col cols="2">
+                <v-checkbox
+                  class="shrink mr-0 mt-0"
+                  style="z-index: 89"
+                  v-for="(geoMethods, index) in methodLegend"
+                  :key="index"
+                  v-model="geoMethods.checked"
+                  :label="geoMethods.name"
+                >
+                </v-checkbox>
+              </v-col>
+            </div>
+          </l-control>
           <l-control-scale
             position="topright"
             :imperial="false"
@@ -91,7 +111,7 @@ import {
   LMarker,
   LPolyline,
   LControlScale,
-  // LControl,
+  LControl,
   LIconDefault,
   LPopup,
 } from "vue2-leaflet";
@@ -103,12 +123,6 @@ import citiesLatLongjson from "../data/cities_of_turkey.json";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 delete Icon.Default.prototype._getIconUrl;
-
-Icon.Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-  iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-});
 
 function onEachFeature(feature, layer) {
   var v = this;
@@ -147,18 +161,15 @@ export default {
     LPolyline,
     LGeoJson,
     LControlScale,
-    // LControl,
+    LControl,
     "v-marker-cluster": Vue2LeafletMarkerCluster,
     "v-marker": LMarker,
     "v-icondefault": LIconDefault,
     "v-popup": LPopup,
   },
   data() {
-    let customicon = icon(
-      Object.assign({}, Icon.Default.prototype.options, { iconUrl, shadowUrl })
-    );
     return {
-      icon: customicon,
+      icon: null,
       // showButton: false,
       polyline: [],
       responseData: null,
@@ -180,6 +191,12 @@ export default {
       showGeojson: false,
       searchParam: null,
       options: { onEachFeature: onEachFeature.bind(this) },
+      methodLegend: [
+        { name: "Elektrik ve Elektromanyetik Yöntemler", checked: false },
+        { name: "Potansiyel Yöntemler", checked: false },
+        { name: "Sismik Yöntemler", checked: false },
+        { name: "Kuyu Ölçümleri", checked: false },
+      ],
       //Farkli geojsonlar icin gereken parametreler
       scaleControls: [
         {
@@ -219,10 +236,18 @@ export default {
     };
   },
   methods: {
+    handlePopupClick(val) {
+      let routeData = this.$router.resolve({
+        name: "tutorial",
+        params: { id: val },
+      });
+      window.open(routeData.href, "_blank");
+      // this.$router.push({ name: "tutorial", params: { id: val } });
+    },
     //haritaya geri donunce zoomu resetler
     // resetZoom() {
-    //   (this.zoom = 6), (this.center = [39.750359, 37.015598]);
-    //   setTimeout(() => (this.showButton = false), 100);
+    //   this.zoom = 6;
+    //   this.center = [39.750359, 37.015598];
     // },
     //secilen ile gore projeleri getiren servisi cagirir
     dataService(val) {
@@ -244,6 +269,7 @@ export default {
               }
             }
           });
+
           // this.showButton = true;
         })
         .catch((e) => {
@@ -259,11 +285,10 @@ export default {
     //farkli olceklerde parsel geojsonlari ve sehir geojsoni getirmek icin (checkbox change)
     changeScale(ev, checked, val) {
       // this.showButton = false;
-      // this.center = [39.750359, 37.015598];
-      // this.zoom = 6;
+
       if (checked === false) {
         this.showGeojson = false;
-        this.preventDefault();
+        // this.preventDefault();
       } else {
         for (let i = 0; i < this.scaleControls.length; i++) {
           if (val !== this.scaleControls[i].factor) {
@@ -288,7 +313,66 @@ export default {
           latlng: params.markerLatlong,
           text: params.text,
         });
+        if (params.yontem == "Sismik Yöntemler") {
+          Icon.Default.mergeOptions({
+            iconRetinaUrl: require("../assets/seismic.png"),
+            iconUrl: require("../assets/seismic.png"),
+            shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+          });
+          this.generateIcon(iconUrl, shadowUrl);
+        }
+        if (params.yontem == "Elektrik ve Elektromanyetik Yöntemler") {
+          Icon.Default.mergeOptions({
+            iconRetinaUrl: require("../assets/battery.png"),
+            iconUrl: require("../assets/battery.png"),
+            shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+          });
+          this.generateIcon(iconUrl, shadowUrl);
+        }
+        if (params.yontem == "Kuyu Ölçüleri") {
+          Icon.Default.mergeOptions({
+            iconRetinaUrl: require("../assets/drilling-rig.png"),
+            iconUrl: require("../assets/drilling-rig.png"),
+            shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+          });
+          this.generateIcon(iconUrl, shadowUrl);
+        }
+        if (params.altyontem == "Gravite") {
+          Icon.Default.mergeOptions({
+            iconRetinaUrl: require("../assets/gravity.png"),
+            iconUrl: require("../assets/gravity.png"),
+            shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+          });
+          this.generateIcon(iconUrl, shadowUrl);
+        }
+        if (params.altyontem == "Manyetik") {
+          Icon.Default.mergeOptions({
+            iconRetinaUrl: require("../assets/magnetic-field.png"),
+            iconUrl: require("../assets/magnetic-field.png"),
+            shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+          });
+          this.generateIcon(iconUrl, shadowUrl);
+        }
+        if (params.altyontem == "Radyometri") {
+          // ../assets/radiation-detector.png
+          Icon.Default.mergeOptions({
+            iconRetinaUrl: require("../assets/radiation-detector.png"),
+            iconUrl: require("../assets/radiation-detector.png"),
+            shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+          });
+          this.generateIcon(iconUrl, shadowUrl);
+        }
       }
+    },
+    generateIcon(iconUrl, shadowUrl) {
+      let customicon = icon(
+        Object.assign({}, Icon.Default.prototype.options, {
+          iconUrl,
+          shadowUrl,
+        })
+      );
+
+      this.icon = customicon;
     },
     //asenkron geojson servisi. (checkbox change)
     async scaleService(val) {
@@ -302,6 +386,13 @@ export default {
       this.showGeojson = true;
       this.loading = false;
     },
+  },
+  watch: {
+    geojson: function () {
+      this.$refs.lMap.setCenter([39.750359, 37.015598]);
+      this.$refs.lMap.setZoom(6);
+    },
+    deep: true,
   },
   computed: {
     styleFunction() {
@@ -348,5 +439,25 @@ export default {
 } */
 .pseudoClass {
   fill: #95ffff;
+}
+.leaflet-marker-icon {
+  width: 42px !important;
+  height: 42px !important;
+}
+.legend {
+  padding: 6px 8px;
+  font: 14px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  /*box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);*/
+  /*border-radius: 5px;*/
+  line-height: 24px;
+  color: #555;
+}
+</style>
+<style module>
+.baz >>> .leaflet-marker-icon {
+  width: 42px !important;
+  height: 42px !important;
 }
 </style>

@@ -19,7 +19,15 @@
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="4">
-                <v-btn small @click="handlePageChange"> Ara </v-btn>
+                <v-btn
+                  small
+                  @click="
+                    page = 1;
+                    retrieveTutorials();
+                  "
+                >
+                  Ara
+                </v-btn>
               </v-col>
               <!-- <search-detail></search-detail> -->
               <v-col cols="12" sm="12">
@@ -48,15 +56,13 @@
 
               <v-col cols="12" sm="12">
                 <v-card class="mx-auto" tile>
-                  <v-card-title>Projeler</v-card-title>
-
                   <v-data-table
                     :headers="headers"
                     :items="tutorials"
                     disable-pagination
                     :hide-default-footer="true"
                     @click:row="handleClick"
-                    class="row-pointer mb-2"
+                    class="row-pointer mb-2 elevation-1"
                     :key="componentKey"
                   >
                     <template
@@ -80,12 +86,6 @@
                       >
                     </template>
                   </v-data-table>
-
-                  <!-- <v-card-actions v-if="tutorials.length > 0">
-          <v-btn small color="error" @click="removeAllTutorials">
-            Remove All
-          </v-btn>
-        </v-card-actions> -->
                 </v-card>
               </v-col>
             </v-row>
@@ -273,7 +273,12 @@ export default {
     },
 
     handleClick(value) {
-      this.$router.push({ name: "tutorial", params: { id: value.id } });
+      let routeData = this.$router.resolve({
+        name: "tutorial",
+        params: { id: value.id },
+      });
+      window.open(routeData.href, "_blank");
+      // this.$router.push({ name: "tutorial", params: { id: value.id } });
     },
     handlePageChange(value) {
       this.page = value;
@@ -288,9 +293,9 @@ export default {
     getDisplayTutorial(tutorial) {
       return {
         id: tutorial.id,
-        nokta_adi: tutorial.nokta_adi.substr(0, 20), //+ "...",
-        yontem: tutorial.yontem.substr(0, 20) + "...",
-        alt_yontem: tutorial.alt_yontem.substr(0, 10), //+ "...",
+        nokta_adi: tutorial.nokta_adi, //.substr(0, 20), //+ "...",
+        yontem: tutorial.yontem, //.substr(0, 20) + "...",
+        alt_yontem: tutorial.alt_yontem, //.substr(0, 10), //+ "...",
         status: tutorial.published ? "Yayında" : "Beklemede",
       };
     },
@@ -303,7 +308,7 @@ export default {
 
 <style>
 .list {
-  max-width: 750px;
+  max-width: 800px;
   position: relative;
   z-index: 4;
 }

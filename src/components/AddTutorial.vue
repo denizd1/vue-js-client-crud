@@ -155,6 +155,84 @@ export default {
         details: "",
         published: false,
       },
+      fileHeader: [
+        "nokta_adi",
+        "yontem",
+        "alt_yontem",
+        "calisma_amaci",
+        "satilabilirlik",
+        "ham_veri",
+        "calisma_tarihi",
+        "proje_kodu",
+        "kuyu_arsiv_no",
+        "jeofizik_arsiv_no",
+        "derleme_no",
+        "cd_no",
+        "il",
+        "ilce",
+        "x",
+        "y",
+        "z",
+        "profil_baslangic_x",
+        "profil_baslangic_y",
+        "profil_bitis_x",
+        "profil_bitis_y",
+        "zone",
+        "datum",
+        "besyuzbin",
+        "yuzbin",
+        "yirmibesbin",
+        "olculen_parametre_ler",
+        "acilim_yonu",
+        "acilim_yontemi",
+        "frekans_araligi",
+        "mt_olcu_suresisaat",
+        "z_bileseni",
+        "amt_olcusu",
+        "amt_olcu_suresi",
+        "tem_olcusu",
+        "kalibrasyon_dosyasi",
+        "veri_formati",
+        "ab2_m",
+        "derinlik_m_gr",
+        "derinlik_m_neu",
+        "derinlik_m_den",
+        "derinlik_m_res",
+        "derinlik_m_sp",
+        "derinlik_m_cal",
+        "derinlik_m_term",
+        "derinlik_m_sgr",
+        "derinlik_m_cbl",
+        "derinlik_m_son",
+        "derinlik_m_ccl",
+        "hat_boyu_m",
+        "kayit_boyu_sn",
+        "sweep_suresi_sn",
+        "sweep_tipi",
+        "sweep_sayisi",
+        "sweep_frekanslari_sn_hz",
+        "sweep_taper_ms",
+        "yayim_tipi",
+        "ofsetm",
+        "jeofon_dizilimi",
+        "grup_araligim",
+        "atis_araligim",
+        "ornekleme_araligim",
+        "ekipman",
+        "enerji_kaynagi",
+        "km2",
+        "profil_boyukm",
+        "elektrot_araligi",
+        "dizilim_turu",
+        "seviye_sayisi",
+        "profil_araligi",
+        "a_1",
+        "a_2",
+        "a_3",
+        "a_4",
+        "olcu_karne_no",
+        "dis_loop_boyutu",
+      ],
       methodSubmethod: [
         {
           yontemAdi: "Potansiyel Alan Yöntemleri",
@@ -203,7 +281,7 @@ export default {
       submitted: false,
       fillSubMethod: [],
       fillDistrict: [],
-      excelDatalist: [],
+      excelDatalist: {},
       select: { yontemAdi: "" },
       message: "",
       show: false,
@@ -270,7 +348,6 @@ export default {
     importExcel(e) {
       this.excelDatalist = [];
       const files = e.target.files;
-      console.log(files);
 
       if (!files.length) {
         this.show = false;
@@ -294,17 +371,24 @@ export default {
           });
           const wsname = workbook.SheetNames[0]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet]    Get the data of the first sheet
-
-          const excellist = []; // Clear received data
-          // Edit data
-          for (var i = 0; i < ws.length; i++) {
-            excellist.push(ws[i]);
-          }
-          this.excelDatalist = excellist;
-          console.log("Read results", this.excelDatalist); // At this point, you get an array containing objects that need to be processed
-          // Get header2-1
           const a = workbook.Sheets[workbook.SheetNames[0]];
           const headers = this.getHeader(a);
+          const excellist = []; // Clear received data
+
+          // Edit data
+          // console.log(ws, ws.length);
+          for (var j = 0; j < ws.length; j++) {
+            const objects = {};
+            for (let index = 0; index < this.fileHeader.length; index++) {
+              objects[this.fileHeader[index]] = ws[j][headers[index]]
+                ? ws[j][headers[index]]
+                : null;
+            }
+            excellist.push(objects);
+          }
+          this.excelDatalist = excellist;
+          console.log(this.excelDatalist);
+
           console.log("headers", headers);
           // Get header2-2
         } catch (e) {
@@ -338,10 +422,14 @@ export default {
     },
     dataImporter() {
       var arr = this.excelDatalist;
+      console.log(arr);
+
       for (let i = 0; i < arr.length; i++) {
         var data = {};
         Object.entries(this.excelDatalist[i]).forEach(([key, value]) => {
-          data[key] = value ? value : null; // key - value
+          var val = value ? this.replaceVal(value) : null;
+
+          data[key] = val; // key - value
         });
         console.log("data", data);
         TutorialDataService.create(data)
@@ -355,6 +443,84 @@ export default {
           });
       }
       this.excelDatalist = [];
+    },
+    replaceVal(value) {
+      switch (value) {
+        case "POTANSıYEL_ALAN_YONTEMLERI":
+          return "Potansiyel Alan Yöntemleri";
+        case "ELEKTRIK_VE_ELEKTROMANYETIK_YONTEMLER":
+          return "Elektrik ve Elektromanyetik Yöntemler";
+        case "SISMIK_YONTEMLER":
+          return "Sismik Yöntemler";
+        case "KUYU_OLCULERI":
+          return "Kuyu Ölçüleri";
+        case "GRAVITE":
+          return "Gravite";
+        case "MANYETIK":
+          return "Manyetik";
+        case "RADYOMETRI":
+          return "Radyometri";
+        case "SUSEPTIBILITE":
+          return "Suseptibilite";
+        case "DUSEY_ELEKTRIK_SONDAJI(DES)":
+          return "Düşey Elektrik Sondajı (DES)";
+        case "GECICI_ELEKTROMANYETIK_YONTEM(TEM)":
+          return "Geçici Elektromanyetik Yöntem (TEM)";
+        case "YAPAY_UCLASMA_YONTEMI(IP)":
+          return "Yapay Uçlaşma Yöntemi (IP)";
+        case "GRADIENT_YAPAY_UCLASMA_YONTEMI(IP)":
+          return "Gradient Yapay Uçlaşma Yöntemi (IP)";
+        case "MANYETO_TELLURIK(MT)":
+          return "Manyetotellürik (MT)";
+        case "AUDIO_MANYETO_TELLURIK(AMT)":
+          return "Audio Manyetotellürik (AMT)";
+        case "YAPAY_KAYNAKLI_AUDIO_MANYETO_TELLURIK(CSAMT)":
+          return "Yapay Kaynaklı Audio Manyetotellürik (CSAMT)";
+        case "DOGAL_POTANSIYEL(SP)":
+          return "Doğal Potansiyel (SP)";
+        case "COK_KANALLI_OZDIRENC_YONTEMI":
+          return "Çok Kanallı Özdirenç Yöntemi";
+        case "2_BOYUTLU_SISMIK_YANSIMA":
+          return "2 Boyutlu Sismik Yansıma";
+        case "YER_RADARI":
+          return "Yer Radarı";
+        case "GAMMA_RAY(GR)":
+          return "Gamma Ray (Gr)";
+        case "NEUTRON(NEU)":
+          return "Neutron (Neu)";
+        case "DENSITY(DEN)":
+          return "Density (Den)";
+        case "RESISTVITY(RES)":
+          return "Resistivity (Res)";
+        case "SELF_POTANTIAL(SP)":
+          return "Self Potential (SP)";
+        case "CALIPER(CAL)":
+          return "Caliper (Cal)";
+        case "SICAKLIK_LOGU(TERM)":
+          return "Sıcaklık Logu (Term)";
+        case "SPEKTRAL_GAMMARAY(SGR)":
+          return "Spektral Gammaray (SGR)";
+        case "CIMENTO_LOGU(CBL)":
+          return "Çimento Logu (Cbl)";
+        case "SONIC_LOG(SON)":
+          return "Sonic Log (Son)";
+        case "CASING_COLLOR_LOCATOR(CCL)":
+          return "Casing Collor Locator (CCL)";
+        case "BIRLESIK_LOG":
+          return "Birleşik Log";
+        case "LİNEER":
+          return "Lineer";
+        case "SATILABILIR":
+          return "Satılabilir";
+        case "RADYOAKTİF HAMMADDE":
+          return "Radyoaktif Hammadde";
+        case "KOMUR":
+          return "Kömür";
+        case "VAR":
+          return "Var";
+        default:
+          return value.toLocaleLowerCase("tr-TR");
+      }
     },
     saveTutorial() {
       var data = {
