@@ -50,7 +50,7 @@ export default {
       if (vm.$store.state.auth.user) {
         vm.getTutorial(vm.$route.params.id);
       } else {
-        next({ name: "home" });
+        next({ name: "login" });
       }
     });
   },

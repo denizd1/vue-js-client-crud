@@ -100,21 +100,22 @@
         <v-tab-item :key="2" value="importExcel">
           <div class="mt-3 mr-3 ml-3">
             <label for="formFile" class="form-label"
-              >Yüklemek için .csv uzantılı bir Excel dosyası seçin.</label
+              >Yüklemek için xls ya da xlsx uzantılı bir Excel dosyası
+              seçin.</label
             >
             <input
               class="form-control"
               type="file"
               id="formFile"
               @change="importExcel"
-              accept=".csv"
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             />
           </div>
           <div class="mt-3 mr-3 ml-3" v-show="show">
             {{ message }}
           </div>
           <!-- <input type="file" @change="importExcel" accept=".csv" /> -->
-
+          <!-- accept=".csv" -->
           <v-btn color="primary" class="mt-3 mr-3 ml-3" @click="dataImporter"
             >Excel Import</v-btn
           >
@@ -287,17 +288,24 @@ export default {
       show: false,
     };
   },
-  // beforeRouteEnter(to, from, next) {
-  //   next((vm) => {
-  //     if (
-  //       !vm.$store.state.auth.user ||
-  //       !vm.$store.state.auth.user.roles.includes("ROLE_ADMIN") ||
-  //       !vm.$store.state.auth.user.roles.includes("ROLE_MODERATOR")
-  //     ) {
-  //       next({ name: "home" });
-  //     }
-  //   });
-  // },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      var val = vm.$store.state.auth.user;
+      if (!val) {
+        vm.$router.push({ name: "login" });
+      } else if (val) {
+        if (val.roles[0] == "ROLE_USER") {
+          vm.$router.push({ name: "tutorials-list" });
+        }
+        if (val.roles[0] == "ROLE_ADMIN") {
+          return;
+        }
+        if (val.roles[0] == "ROLE_MODERATOR") {
+          return;
+        }
+      }
+    });
+  },
   computed: {
     tab: {
       set(tab) {
@@ -328,6 +336,7 @@ export default {
             XLSX.utils.encode_cell({ c: C, r: R })
           ]; /* Get the cell value based on the address  find the cell in the first row */
         var hdr = "UNKNOWN" + C; // replace with your desired default
+
         // XLSX.utils.format_cell Generate cell text value
         if (cell && cell.t) hdr = XLSX.utils.format_cell(cell);
         if (hdr.indexOf("UNKNOWN") > -1) {
@@ -351,9 +360,10 @@ export default {
 
       if (!files.length) {
         this.show = false;
-      } else if (!/\.(csv)$/.test(files[0].name.toLowerCase())) {
+      } else if (!/\.(xls|xlsx)$/.test(files[0].name.toLowerCase())) {
         this.show = true;
-        this.message = "Yalnızca .csv uzantılı dosya yukleyebilirsiniz!";
+        this.message =
+          "Yalnızca xls ya da xlsx uzantılı dosya yukleyebilirsiniz!";
         return;
       } else {
         this.show = false;
@@ -367,17 +377,18 @@ export default {
 
           const XLSX = xlsx;
           const workbook = XLSX.read(data, {
-            type: "string",
+            type: "binary", //string
           });
-          const wsname = workbook.SheetNames[0]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
+          const wsname = workbook.SheetNames[1]; // Take the first sheet，wb.SheetNames[0] :Take the name of the first sheet in the sheets
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); // Generate JSON table content，wb.Sheets[Sheet]    Get the data of the first sheet
-          const a = workbook.Sheets[workbook.SheetNames[0]];
+          const a = workbook.Sheets[workbook.SheetNames[1]];
           const headers = this.getHeader(a);
           const excellist = []; // Clear received data
 
           // Edit data
-          // console.log(ws, ws.length);
+          console.log(XLSX.utils.sheet_to_json(workbook.Sheets[wsname]));
           for (var j = 0; j < ws.length; j++) {
+            console.log(ws[j][j]);
             const objects = {};
             for (let index = 0; index < this.fileHeader.length; index++) {
               objects[this.fileHeader[index]] = ws[j][headers[index]]
@@ -387,7 +398,7 @@ export default {
             excellist.push(objects);
           }
           this.excelDatalist = excellist;
-          console.log(this.excelDatalist);
+          // console.log(value);
 
           console.log("headers", headers);
           // Get header2-2
@@ -395,7 +406,9 @@ export default {
           return alert("Read failure!");
         }
       };
-      fileReader.readAsText(files[0]);
+      fileReader.readAsBinaryString(files[0]);
+      // readAsText(files[0]);
+      // readAsBinaryString(files[0])
       // var input = document.getElementById("upload");
       // input.value = "";
     },
@@ -519,7 +532,7 @@ export default {
         case "VAR":
           return "Var";
         default:
-          return value.toLocaleLowerCase("tr-TR");
+          return value;
       }
     },
     saveTutorial() {

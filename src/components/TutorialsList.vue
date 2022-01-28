@@ -11,7 +11,6 @@
         <v-tabs-items v-model="tab">
           <v-tab-item :key="1" value="listView" :eager="true">
             <v-row align="center" class="list px-3 mx-auto">
-              <!-- <v-col></v-col> -->
               <v-col cols="12" md="8">
                 <v-text-field
                   v-model="searchTitle"
@@ -192,7 +191,7 @@ export default {
   methods: {
     getSelectedcity(val) {
       this.selectedCity = val;
-      // console.log(this.selectedCity);
+      console.log(this.selectedCity);
     },
     getRequestParams(searchTitle, page, pageSize) {
       let params = {};

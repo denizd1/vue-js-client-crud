@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Login from './views/Login.vue';
-import Register from './views/Register.vue';
+import Login from './components/Login.vue';
+import Register from './components/Register.vue';
 // import store from '@/store/index.js';
 Vue.use(Router);
 
@@ -36,6 +36,7 @@ export const router = new Router({
     },
     {
       path: '/login',
+      name:'login',
       component: Login
     },
     {
@@ -46,37 +47,7 @@ export const router = new Router({
       path: '/profile',
       name: 'profile',
       // lazy-loaded
-      component: () => import('./views/Profile')
-    },
-    // {
-    //   path: '/admin',
-    //   name: 'admin',
-    //   // lazy-loaded
-    //   component: () => import('./views/BoardAdmin.vue')
-    // },
-    // {
-    //   path: '/mod',
-    //   name: 'moderator',
-    //   // lazy-loaded
-    //   component: () => import('./views/BoardModerator.vue')
-    // },
-    // {
-    //   path: '/user',
-    //   name: 'user',
-    //   // lazy-loaded
-    //   component: () => import('./views/BoardUser.vue')
-    // }
+      component: () => import('./components/Profile')
+    }
   ]
 });
-
-// router.beforeResolve((to, from, next) => {
-//   if (to.matched.some(record => record.meta.auth)) {
-//     if (!store.getters.authToken) {
-//       next({ name: 'home' });
-//     } else {
-//       next();
-//     }
-//   } else {
-//     next(); // Very important to call next() in this case!
-//   }
-// })

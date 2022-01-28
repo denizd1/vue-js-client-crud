@@ -62,6 +62,19 @@
               </li>
             </ul>
             <ul v-if="currentUser" class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li v-if="isUseradmin || isUsermoderator" class="nav-item">
+                <router-link to="/tutorials-list" class="nav-link">
+                  <font-awesome-icon icon="tasks" />
+                  Projeler
+                </router-link>
+              </li>
+              <li v-if="isUseradmin || isUsermoderator" class="nav-item">
+                <router-link to="/add" class="nav-link">
+                  <font-awesome-icon icon="project-diagram" />
+                  Proje Ekle
+                </router-link>
+              </li>
+
               <li class="nav-item">
                 <router-link to="/profile" class="nav-link">
                   <font-awesome-icon icon="user" />
@@ -80,20 +93,6 @@
     </header>
     <v-main>
       <router-view />
-
-      <!-- <v-app-bar app dark fixed>
-      <div class="d-flex align-center mr-2">
-        <v-img
-          class="mta-logo mx-auto"
-          src="../src/assets/logo.png"
-          alt="MTA logo"
-        ></v-img>
-      </div>
-
-      <v-btn to="/tutorials" text> Tutorials </v-btn>
-
-      <v-btn to="/add" text> Add </v-btn>
-    </v-app-bar> -->
       <vue-particles
         class="particle-bg"
         color="#dedede"
@@ -129,13 +128,13 @@ export default {
     currentUser() {
       return this.$store.state.auth.user;
     },
-    showAdminBoard() {
+    isUseradmin() {
       if (this.currentUser && this.currentUser.roles) {
         return this.currentUser.roles.includes("ROLE_ADMIN");
       }
       return false;
     },
-    showModeratorBoard() {
+    isUsermoderator() {
       if (this.currentUser && this.currentUser.roles) {
         return this.currentUser.roles.includes("ROLE_MODERATOR");
       }

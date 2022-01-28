@@ -1,29 +1,18 @@
 <template>
   <v-container>
+    <left-nav @fireScalechange="changeScale"></left-nav>
+
     <v-row>
       <v-col
         cols="12"
         class="p-0"
         style="height: 600px; width: 100%; z-index: 99"
       >
-        <v-row>
+        <!-- <v-row>
           <v-col cols="12" md="6">
-            <v-checkbox
-              class="float-left mr-2 mt-0 shrink"
-              style="z-index: 89"
-              v-for="(scaleControl, index) in scaleControls"
-              :key="index"
-              v-model="scaleControl.checked"
-              :color="scaleControl.color"
-              :label="scaleControl.label"
-              :input-value="scaleControl.factor"
-              @click="
-                changeScale($event, scaleControl.checked, scaleControl.factor)
-              "
-            >
-            </v-checkbox>
+            
           </v-col>
-        </v-row>
+        </v-row> -->
         <l-map
           v-if="showMap"
           ref="lMap"
@@ -70,21 +59,7 @@
             :options="options"
             :options-style="styleFunction"
           />
-          <l-control style="display: none" :position="'bottomleft'">
-            <div class="legend">
-              <v-col cols="2">
-                <v-checkbox
-                  class="shrink mr-0 mt-0"
-                  style="z-index: 89"
-                  v-for="(geoMethods, index) in methodLegend"
-                  :key="index"
-                  v-model="geoMethods.checked"
-                  :label="geoMethods.name"
-                >
-                </v-checkbox>
-              </v-col>
-            </div>
-          </l-control>
+
           <l-control-scale
             position="topright"
             :imperial="false"
@@ -111,7 +86,6 @@ import {
   LMarker,
   LPolyline,
   LControlScale,
-  LControl,
   LIconDefault,
   LPopup,
 } from "vue2-leaflet";
@@ -123,6 +97,7 @@ import citiesLatLongjson from "../data/cities_of_turkey.json";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 delete Icon.Default.prototype._getIconUrl;
+import LeftNav from "./LeftNav.vue";
 
 function onEachFeature(feature, layer) {
   var v = this;
@@ -161,7 +136,7 @@ export default {
     LPolyline,
     LGeoJson,
     LControlScale,
-    LControl,
+    LeftNav,
     "v-marker-cluster": Vue2LeafletMarkerCluster,
     "v-marker": LMarker,
     "v-icondefault": LIconDefault,
@@ -191,48 +166,6 @@ export default {
       showGeojson: false,
       searchParam: null,
       options: { onEachFeature: onEachFeature.bind(this) },
-      methodLegend: [
-        { name: "Elektrik ve Elektromanyetik Yöntemler", checked: false },
-        { name: "Potansiyel Yöntemler", checked: false },
-        { name: "Sismik Yöntemler", checked: false },
-        { name: "Kuyu Ölçümleri", checked: false },
-      ],
-      //Farkli geojsonlar icin gereken parametreler
-      scaleControls: [
-        {
-          id: 1,
-          name: "yirmibesBin",
-          factor: 25,
-          label: "1/25.000",
-          checked: false,
-          color: "success",
-        },
-
-        {
-          id: 2,
-          name: "yuzBin",
-          factor: 100,
-          label: "1/100.000",
-          checked: false,
-          color: "success",
-        },
-        {
-          id: 3,
-          name: "besyuzBin",
-          factor: 500,
-          label: "1/500.000",
-          checked: false,
-          color: "success",
-        },
-        {
-          id: 4,
-          name: "iller",
-          factor: 0,
-          label: "İller",
-          checked: false,
-          color: "success",
-        },
-      ],
     };
   },
   methods: {
@@ -283,20 +216,13 @@ export default {
       this.currentCenter = center;
     },
     //farkli olceklerde parsel geojsonlari ve sehir geojsoni getirmek icin (checkbox change)
-    changeScale(ev, checked, val) {
+    changeScale(val, geoParam) {
       // this.showButton = false;
 
-      if (checked === false) {
-        this.showGeojson = false;
-        // this.preventDefault();
-      } else {
-        for (let i = 0; i < this.scaleControls.length; i++) {
-          if (val !== this.scaleControls[i].factor) {
-            this.scaleControls[i].checked = false;
-          }
-        }
-        this.scaleService(val);
-      }
+      this.showGeojson = geoParam;
+      // this.preventDefault();
+
+      this.scaleService(val);
     },
     triggerExternalplot(currentTutorial) {
       var params = ProfilePlotter(currentTutorial);
@@ -445,14 +371,8 @@ export default {
   height: 42px !important;
 }
 .legend {
-  padding: 6px 8px;
-  font: 14px Arial, Helvetica, sans-serif;
-  background: white;
+  padding: 5px;
   background: rgba(255, 255, 255, 0.8);
-  /*box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);*/
-  /*border-radius: 5px;*/
-  line-height: 24px;
-  color: #555;
 }
 </style>
 <style module>
