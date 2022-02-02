@@ -7,26 +7,29 @@ import VueParticles from 'vue-particles'
 import store from './store';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import VeeValidate from 'vee-validate';
 import Vuex from 'vuex';
-import { library } from '@fortawesome/fontawesome-svg-core';
+// import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faHome,
-  faUser,
-  faUserPlus,
-  faSignInAlt,
-  faSignOutAlt,
-  faProjectDiagram,
-  faTasks
-} from '@fortawesome/free-solid-svg-icons';
+// import {
+//   faHome,
+//   faUser,
+//   faUserPlus,
+//   faSignInAlt,
+//   faSignOutAlt,
+//   faProjectDiagram,
+//   faTasks
+// } from '@fortawesome/free-solid-svg-icons';
 
 import setupInterceptors from './services/setupInterceptors';
 
 
 
-library.add(faHome, faUser, faUserPlus, faSignInAlt, faSignOutAlt,faProjectDiagram,faTasks);
+// library.add(faHome, faUser, faUserPlus, faSignInAlt, faSignOutAlt,faProjectDiagram,faTasks);
 
 
 Vue.config.productionTip = false;
@@ -36,7 +39,7 @@ Vue.use(Vuex);
 Vue.use(VeeValidate);
 
 setupInterceptors(store);
-
+export const bus = new Vue();
 new Vue({
   router,
   vuetify,

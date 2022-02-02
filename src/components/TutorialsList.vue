@@ -5,7 +5,7 @@
         <v-row align="center" class="list px-3 mx-auto">
           <v-tabs centered v-model="tab">
             <v-tab href="#listView">Liste Görünümü</v-tab>
-            <v-tab href="#mapView">Harita Görünümü</v-tab>
+            <v-tab @click="reloadMap()" href="#mapView">Harita Görünümü</v-tab>
           </v-tabs>
         </v-row>
         <v-tabs-items v-model="tab">
@@ -89,7 +89,7 @@
               </v-col>
             </v-row>
           </v-tab-item>
-          <v-tab-item :key="2" value="mapView">
+          <v-tab-item :key="2" value="mapView" :eager="true">
             <turkey-map @searchParam="getSelectedcity"></turkey-map>
           </v-tab-item>
         </v-tabs-items>
@@ -102,6 +102,7 @@
 import TutorialDataService from "../services/TutorialDataService";
 // import SearchDetail from "./SearchDetail.vue";
 import TurkeyMap from "./TurkeyMap.vue";
+import { bus } from "../main";
 
 export default {
   name: "tutorials-list",
@@ -189,9 +190,11 @@ export default {
     },
   },
   methods: {
+    reloadMap() {
+      bus.$emit("renderMap");
+    },
     getSelectedcity(val) {
       this.selectedCity = val;
-      console.log(this.selectedCity);
     },
     getRequestParams(searchTitle, page, pageSize) {
       let params = {};
@@ -234,17 +237,6 @@ export default {
     refreshList() {
       this.retrieveTutorials();
     },
-
-    // removeAllTutorials() {
-    //   TutorialDataService.deleteAll()
-    //     .then((response) => {
-    //       console.log(response.data);
-    //       this.refreshList();
-    //     })
-    //     .catch((e) => {
-    //       console.log(e);
-    //     });
-    // },
 
     // searchTitle() {
     //   TutorialDataService.findByTitle(this.title)

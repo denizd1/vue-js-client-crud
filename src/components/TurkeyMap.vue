@@ -1,21 +1,10 @@
 <template>
   <v-container>
-    <left-nav @fireScalechange="changeScale"></left-nav>
-
     <v-row>
-      <v-col
-        cols="12"
-        class="p-0"
-        style="height: 600px; width: 100%; z-index: 99"
-      >
-        <!-- <v-row>
-          <v-col cols="12" md="6">
-            
-          </v-col>
-        </v-row> -->
+      <v-col cols="12" style="height: 600px; width: 100%; z-index: 99">
         <l-map
           v-if="showMap"
-          ref="lMap"
+          ref="map"
           :zoom="zoom"
           :no-blocking-animations="true"
           :center="center"
@@ -65,11 +54,6 @@
             :imperial="false"
             :metric="true"
           ></l-control-scale>
-          <!-- <l-control v-if="showButton" position="bottomleft">
-            <v-btn depressed elevation="2" small @click="resetZoom"
-              >Haritaya Geri Dön</v-btn
-            >
-          </l-control> -->
         </l-map>
       </v-col>
     </v-row>
@@ -92,12 +76,12 @@ import {
 import { ProfilePlotter } from "../common/ProfilePlotter.js";
 import http from "../http-common";
 import { Icon, icon } from "leaflet";
+import { bus } from "../main";
 
 import citiesLatLongjson from "../data/cities_of_turkey.json";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 delete Icon.Default.prototype._getIconUrl;
-import LeftNav from "./LeftNav.vue";
 
 function onEachFeature(feature, layer) {
   var v = this;
@@ -112,7 +96,8 @@ function onEachFeature(feature, layer) {
       e.originalEvent.target.classList.add("selected");
       e.originalEvent.target.classList.remove("pseudoClass");
       v.$emit("searchParam", this.feature.properties.name);
-      v.dataService(this.feature.properties.name);
+      v.selectedCityparam = this.feature.properties.name;
+      v.dataService(this.feature.properties.name, v.selectedMethod);
     });
     layer.on("mouseover", function (e) {
       document
@@ -136,7 +121,6 @@ export default {
     LPolyline,
     LGeoJson,
     LControlScale,
-    LeftNav,
     "v-marker-cluster": Vue2LeafletMarkerCluster,
     "v-marker": LMarker,
     "v-icondefault": LIconDefault,
@@ -145,7 +129,6 @@ export default {
   data() {
     return {
       icon: null,
-      // showButton: false,
       polyline: [],
       responseData: null,
       markers: [],
@@ -166,44 +149,41 @@ export default {
       showGeojson: false,
       searchParam: null,
       options: { onEachFeature: onEachFeature.bind(this) },
+      selectedMethod: null,
+      selectedCityparam: null,
+      selectedJsonparam: null,
     };
   },
   methods: {
+    getselectedMethod(val) {
+      this.selectedMethod = val;
+      this.dataService(this.selectedCityparam, this.selectedMethod);
+    },
     handlePopupClick(val) {
       let routeData = this.$router.resolve({
         name: "tutorial",
         params: { id: val },
       });
       window.open(routeData.href, "_blank");
-      // this.$router.push({ name: "tutorial", params: { id: val } });
     },
-    //haritaya geri donunce zoomu resetler
-    // resetZoom() {
-    //   this.zoom = 6;
-    //   this.center = [39.750359, 37.015598];
-    // },
-    //secilen ile gore projeleri getiren servisi cagirir
-    dataService(val) {
+    dataService(city, selectedMethod) {
       let params = {};
       this.polyline = [];
       this.markers = [];
-      params["il"] = val;
+      params["il"] = city;
+      params["yontem"] = selectedMethod;
       TutorialDataService.findAllgetAll(params)
         .then((response) => {
           this.responseData = response.data;
 
           this.citiesLatLongjson.filter((elem) => {
-            if (val === elem.il) {
-              // this.center = [elem.latitude, elem.longitude];
-              // this.zoom = 7.8;
+            if (city === elem.il) {
               for (let i = 0; i < this.responseData.length; i++) {
                 //profileplotter.js ile nokta ve profilleri cizmek icin
                 this.triggerExternalplot(this.responseData[i]);
               }
             }
           });
-
-          // this.showButton = true;
         })
         .catch((e) => {
           console.log(e);
@@ -216,12 +196,8 @@ export default {
       this.currentCenter = center;
     },
     //farkli olceklerde parsel geojsonlari ve sehir geojsoni getirmek icin (checkbox change)
-    changeScale(val, geoParam) {
-      // this.showButton = false;
-
-      this.showGeojson = geoParam;
-      // this.preventDefault();
-
+    changeScale(val) {
+      this.selectedJsonparam = val;
       this.scaleService(val);
     },
     triggerExternalplot(currentTutorial) {
@@ -229,10 +205,6 @@ export default {
       if (params.polyline !== null) {
         this.polyline.push(params.polyline);
       }
-
-      // this.center = params.center;
-      // this.currentCenter = params.currentCenter;
-      // console.log(params.withTooltip);
       if (params.markerLatlong !== null) {
         this.markers.push({
           id: params.id,
@@ -315,8 +287,8 @@ export default {
   },
   watch: {
     geojson: function () {
-      this.$refs.lMap.setCenter([39.750359, 37.015598]);
-      this.$refs.lMap.setZoom(6);
+      this.$refs.map.setCenter([39.750359, 37.015598]);
+      this.$refs.map.setZoom(6);
     },
     deep: true,
   },
@@ -333,30 +305,26 @@ export default {
       };
     },
   },
-  // watch: {
-  //   searchParam: {
-  //     handler: function (val) {
-  //       console.log(val);
-  //     },
-  //     deep: true,
-  //     immediate: true,
-  //   },
-  // },
-
-  // async created() {
-  //   this.loading = true;
-  //   const response = await http.get("/getGeoJson25");
-
-  //   const data = await response.data;
-  //   this.geojson = data;
-  //   this.loading = false;
-  // },
+  mounted() {
+    bus.$on("renderMap", () => {
+      setTimeout(() => {
+        //mapObject is a property that is part of leaflet
+        this.$refs.map.mapObject.invalidateSize();
+      }, 100);
+    });
+    bus.$on("fireScalechange", (val) => {
+      this.changeScale(val);
+    });
+    bus.$on("methodParam", (data) => {
+      this.getselectedMethod(data);
+    });
+    bus.$on("hideGeojson", (data) => {
+      this.showGeojson = data;
+    });
+  },
 };
 </script>
 <style>
-@import "~leaflet.markercluster/dist/MarkerCluster.css";
-@import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
-@import "~leaflet/dist/leaflet.css";
 .selected {
   fill-opacity: 0;
 }

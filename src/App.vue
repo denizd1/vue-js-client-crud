@@ -1,98 +1,15 @@
 <template>
   <v-app>
-    <header style="padding-bottom: 100px">
-      <nav
-        class="navbar navbar-expand-lg navbar-light fixed-top bg-light"
-        style="z-index: 99"
-      >
-        <div class="container-fluid">
-          <a href class="navbar-brand" @click.prevent>
-            <v-img
-              class="mta-logo mx-auto"
-              src="../src/assets/logo.png"
-              alt="MTA logo"
-            ></v-img
-          ></a>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <!-- <div class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <router-link to="/home" class="nav-link">
-              <font-awesome-icon icon="home" />Home
-            </router-link>
-          </li>
-          <li v-if="showAdminBoard" class="nav-item">
-            <router-link to="/admin" class="nav-link">Admin Board</router-link>
-          </li>
-          <li v-if="showModeratorBoard" class="nav-item">
-            <router-link to="/mod" class="nav-link"
-              >Moderator Board</router-link
-            >
-          </li>
-          <li class="nav-item">
-            <router-link v-if="currentUser" to="/user" class="nav-link"
-              >User</router-link
-            >
-          </li>
-        </div> -->
-
-          <div
-            class="collapse navbar-collapse ms-auto"
-            id="navbarSupportedContent"
-          >
-            <ul v-if="!currentUser" class="navbar-nav ms-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <router-link to="/register" class="nav-link">
-                  <font-awesome-icon icon="user-plus" /> Kaydol
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/login" class="nav-link">
-                  <font-awesome-icon icon="sign-in-alt" /> Giriş Yap
-                </router-link>
-              </li>
-            </ul>
-            <ul v-if="currentUser" class="navbar-nav ms-auto mb-2 mb-lg-0">
-              <li v-if="isUseradmin || isUsermoderator" class="nav-item">
-                <router-link to="/tutorials-list" class="nav-link">
-                  <font-awesome-icon icon="tasks" />
-                  Projeler
-                </router-link>
-              </li>
-              <li v-if="isUseradmin || isUsermoderator" class="nav-item">
-                <router-link to="/add" class="nav-link">
-                  <font-awesome-icon icon="project-diagram" />
-                  Proje Ekle
-                </router-link>
-              </li>
-
-              <li class="nav-item">
-                <router-link to="/profile" class="nav-link">
-                  <font-awesome-icon icon="user" />
-                  {{ currentUser.username }}
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href @click.prevent="logOut">
-                  <font-awesome-icon icon="sign-out-alt" /> Çıkış
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+    <header>
+      <v-img
+        class="mta-logo mx-auto"
+        src="../src/assets/logo.png"
+        alt="MTA logo"
+      ></v-img>
     </header>
+    <left-nav></left-nav>
     <v-main>
-      <router-view />
+      <router-view style="padding-top: 100px" />
       <vue-particles
         class="particle-bg"
         color="#dedede"
@@ -111,19 +28,22 @@
       >
       </vue-particles>
     </v-main>
-    <v-footer padless>
-      <v-row>
-        <v-col class="py-4 text-center" cols="12">
-          Her Hakkı Saklıdır © MTA {{ new Date().getFullYear() }}
-        </v-col>
-      </v-row>
+    <v-footer>
+      <v-col class="text-center" cols="12">
+        Her Hakkı Saklıdır © MTA {{ new Date().getFullYear() }}
+      </v-col>
     </v-footer>
   </v-app>
 </template>
 
 <script>
 import EventBus from "./common/EventBus";
+import LeftNav from "./components/LeftNav.vue";
+
 export default {
+  components: {
+    LeftNav,
+  },
   computed: {
     currentUser() {
       return this.$store.state.auth.user;
@@ -167,6 +87,9 @@ export default {
 }
 .mta-logo {
   width: 50px;
+  left: 5px;
+  top: 10px;
+  position: fixed;
 }
 /* .particle-wrap:before {
   content: " ";
