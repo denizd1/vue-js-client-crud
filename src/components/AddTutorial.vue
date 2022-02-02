@@ -1,54 +1,56 @@
 <template>
-  <div class="submit-form mt-3 mx-auto">
-    <!-- <p class="headline">Proje Ekle</p> -->
-    <div v-if="!submitted">
-      <v-tabs centered v-model="tab">
-        <v-tab href="#addManual">Proje Oluştur</v-tab>
-        <v-tab href="#importExcel">Excel Import</v-tab>
-      </v-tabs>
-      <v-tabs-items v-model="tab">
-        <v-tab-item :key="1" value="addManual">
-          <v-form class="mr-3 ml-3" ref="form" lazy-validation>
-            <v-select
-              item-text="yontemAdi"
-              placeholder="Bir jeofizik yöntem seçiniz"
-              :items="methodSubmethod"
-              single-line
-              @change="handleChange"
-            >
-            </v-select>
-            <v-select
-              v-if="fillSubMethod.length"
-              item-text="altYontemler"
-              :items="fillSubMethod"
-              placeholder="Bir alt yöntem seçiniz"
-              single-line
-            ></v-select>
+  <v-row>
+    <v-col cols="12">
+      <v-row align="center" class="list mx-auto">
+        <!-- <p class="headline">Proje Ekle</p> -->
+        <div v-if="!submitted">
+          <v-tabs centered v-model="tab">
+            <v-tab href="#addManual">Proje Oluştur</v-tab>
+            <v-tab href="#importExcel">Excel Import</v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="tab">
+            <v-tab-item :key="1" value="addManual">
+              <v-form class="mr-3 ml-3" ref="form" lazy-validation>
+                <v-select
+                  item-text="yontemAdi"
+                  placeholder="Bir jeofizik yöntem seçiniz"
+                  :items="methodSubmethod"
+                  single-line
+                  @change="handleChange"
+                >
+                </v-select>
+                <v-select
+                  v-if="fillSubMethod.length"
+                  item-text="altYontemler"
+                  :items="fillSubMethod"
+                  placeholder="Bir alt yöntem seçiniz"
+                  single-line
+                ></v-select>
 
-            <v-select
-              item-text="il"
-              :items="cities"
-              single-line
-              placeholder="İl Seçiniz"
-              @change="handleCityChange"
-            ></v-select>
+                <v-select
+                  item-text="il"
+                  :items="cities"
+                  single-line
+                  placeholder="İl Seçiniz"
+                  @change="handleCityChange"
+                ></v-select>
 
-            <v-select
-              v-if="fillDistrict.length"
-              item-text="ilceleri"
-              :items="fillDistrict"
-              single-line
-              placeholder="İlçe seçiniz"
-            ></v-select>
+                <v-select
+                  v-if="fillDistrict.length"
+                  item-text="ilceleri"
+                  :items="fillDistrict"
+                  single-line
+                  placeholder="İlçe seçiniz"
+                ></v-select>
 
-            <v-text-field
-              v-model="tutorial.title"
-              :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
-              label="Nokta Adı"
-              required
-            ></v-text-field>
+                <v-text-field
+                  v-model="tutorial.title"
+                  :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
+                  label="Nokta Adı"
+                  required
+                ></v-text-field>
 
-            <!-- <v-text-field
+                <!-- <v-text-field
           v-model="tutorial.description"
           :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
           label="İl"
@@ -61,82 +63,89 @@
           label="İlçe"
           required
         ></v-text-field> -->
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="date"
-                  label="Çalışma Tarihi"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="date"
-                :active-picker.sync="activePicker"
-                :max="
-                  new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-                    .toISOString()
-                    .substr(0, 10)
-                "
-                min="1950-01-01"
-                locale="tr"
-                @change="save"
-              ></v-date-picker>
-            </v-menu>
-            <v-btn color="primary" class="mt-3" @click="saveTutorial"
-              >Kaydet</v-btn
-            >
-          </v-form>
-        </v-tab-item>
-        <v-tab-item :key="2" value="importExcel">
-          <div class="mt-3 mr-3 ml-3">
-            <label for="formFile" class="form-label"
-              >Yüklemek için xls ya da xlsx uzantılı bir Excel dosyası
-              seçin.</label
-            >
-            <input
-              class="form-control"
-              type="file"
-              id="formFile"
-              @change="importExcel"
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            />
-          </div>
-          <div class="mt-3 mr-3 ml-3" v-show="show">
-            {{ message }}
-          </div>
-          <!-- <input type="file" @change="importExcel" accept=".csv" /> -->
-          <!-- accept=".csv" -->
-          <v-btn color="primary" class="mt-3 mr-3 ml-3" @click="dataImporter"
-            >Excel Import</v-btn
-          >
-        </v-tab-item>
-      </v-tabs-items>
-    </div>
+                <v-menu
+                  ref="menu"
+                  v-model="menu"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="date"
+                      label="Çalışma Tarihi"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    v-model="date"
+                    :active-picker.sync="activePicker"
+                    :max="
+                      new Date(
+                        Date.now() - new Date().getTimezoneOffset() * 60000
+                      )
+                        .toISOString()
+                        .substr(0, 10)
+                    "
+                    min="1950-01-01"
+                    locale="tr"
+                    @change="save"
+                  ></v-date-picker>
+                </v-menu>
+                <v-btn color="primary" class="mt-3" @click="saveTutorial"
+                  >Kaydet</v-btn
+                >
+              </v-form>
+            </v-tab-item>
+            <v-tab-item :key="2" value="importExcel">
+              <div class="mt-3 mr-3 ml-3">
+                <label for="formFile" class="form-label"
+                  >Yüklemek için xls ya da xlsx uzantılı bir Excel dosyası
+                  seçin.</label
+                >
+                <input
+                  class="form-control"
+                  type="file"
+                  id="formFile"
+                  @change="importExcel"
+                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                />
+              </div>
+              <div class="mt-3 mr-3 ml-3" v-show="show">
+                {{ message }}
+              </div>
+              <!-- <input type="file" @change="importExcel" accept=".csv" /> -->
+              <!-- accept=".csv" -->
+              <v-btn
+                color="primary"
+                class="mt-3 mr-3 ml-3"
+                @click="dataImporter"
+                >Excel Import</v-btn
+              >
+            </v-tab-item>
+          </v-tabs-items>
+        </div>
 
-    <div v-else>
-      <v-card class="mx-auto">
-        <v-card-title> Proje(ler) Başarıyla Eklendi! </v-card-title>
+        <div v-else>
+          <v-card class="mx-auto">
+            <v-card-title> Proje(ler) Başarıyla Eklendi! </v-card-title>
 
-        <v-card-subtitle>
-          Yeni bir proje eklemek için 'Ekle' butonuna basın.
-        </v-card-subtitle>
+            <v-card-subtitle>
+              Yeni bir proje eklemek için 'Ekle' butonuna basın.
+            </v-card-subtitle>
 
-        <v-card-actions>
-          <v-btn color="success" @click="newTutorial">Ekle</v-btn>
-        </v-card-actions>
-      </v-card>
-    </div>
-  </div>
+            <v-card-actions>
+              <v-btn color="success" @click="newTutorial">Ekle</v-btn>
+            </v-card-actions>
+          </v-card>
+        </div>
+      </v-row>
+    </v-col>
+  </v-row>
 </template>
 
 <script>

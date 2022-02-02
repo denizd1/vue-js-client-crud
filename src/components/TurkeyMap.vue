@@ -308,8 +308,10 @@ export default {
   mounted() {
     bus.$on("renderMap", () => {
       setTimeout(() => {
-        //mapObject is a property that is part of leaflet
-        this.$refs.map.mapObject.invalidateSize();
+        if (this.$refs.map) {
+          //mapObject is a property that is part of leaflet
+          this.$refs.map.mapObject.invalidateSize();
+        }
       }, 100);
     });
     bus.$on("fireScalechange", (val) => {

@@ -1,13 +1,25 @@
 <template>
   <v-card>
     <v-navigation-drawer
-      style="top: 76px !important; z-index: 200 !important"
+      v-model="drawer"
+      app
+      absolute
+      temporary
+      style="z-index: 200 !important"
+    >
+      <!-- <v-navigation-drawer
+      style="top: 64px !important; z-index: 200 !important"
       permanent
       app
       :hide-overlay="true"
       :mini-variant="true"
       :expand-on-hover="true"
-    >
+      :stateless="cityselect"
+      light
+      :style="{
+        'max-height': `calc(100% - 64px) !important`,
+      }"
+    > -->
       <!-- :style="{
       'max-height': `calc(100% - 76px) !important`,
     }" -->
@@ -26,8 +38,6 @@
       </v-list>
 
       <v-list dense v-if="currentUser" class="pt-0">
-        <v-divider style="margin-top: 3px !important"></v-divider>
-
         <v-list-item class="px-2">
           <v-avatar color="primary" size="36"
             ><span class="white--text">{{
@@ -105,7 +115,12 @@
           </v-list>
         </v-list-group>
 
-        <v-list-group prepend-icon="mdi-sine-wave" :value="false" no-action>
+        <v-list-group
+          prepend-icon="mdi-sine-wave"
+          :value="false"
+          no-action
+          v-if="showNavmethod"
+        >
           <template v-slot:activator>
             <v-list-item-content>
               <v-list-item-title>Yöntem</v-list-item-title>
@@ -125,20 +140,63 @@
             </v-list-item>
           </v-list>
         </v-list-group>
+
+        <v-list-group
+          prepend-icon="mdi-city-variant-outline"
+          :value="false"
+          no-action
+        >
+          <template v-slot:activator>
+            <v-list-item-content>
+              <v-list-item-title>İl / İlçe</v-list-item-title>
+            </v-list-item-content>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-select
+                style="display: block"
+                item-text="il"
+                :items="cities"
+                single-line
+                placeholder="İl Seçiniz"
+                @change="handleCityChange"
+              ></v-select>
+            </v-list-item>
+            <v-list-item>
+              <v-select
+                style="display: block"
+                v-if="fillDistrict.length"
+                item-text="ilceleri"
+                :items="fillDistrict"
+                single-line
+                placeholder="İlçe seçiniz"
+              ></v-select>
+            </v-list-item>
+          </v-list>
+        </v-list-group>
       </v-list>
     </v-navigation-drawer>
+    <v-app-bar flat app>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+    </v-app-bar>
   </v-card>
 </template>
 <script>
 import EventBus from "../common/EventBus";
 import { bus } from "../main";
+import citiesJson from "../data/cities_of_turkey.json";
 
 export default {
   name: "LeftNav",
   data() {
     return {
+      cities: citiesJson,
+      fillSubMethod: [],
+      fillDistrict: [],
       mini: true,
-      showNavelement: false,
+      drawer: false,
+      showNavelement: null,
+      showNavmethod: null,
       menuItems: [
         {
           title: "Kaydol",
@@ -178,7 +236,7 @@ export default {
           id: 4,
           name: "iller",
           factor: 0,
-          label: "İller",
+          label: "İl Sınırları",
           checked: false,
           visibility: false,
         },
@@ -192,6 +250,15 @@ export default {
     };
   },
   methods: {
+    handleCityChange(event) {
+      this.cities.filter((elem) => {
+        if (elem.il === event) {
+          this.fillDistrict = elem.ilceleri;
+        }
+      });
+      // var self = this;
+      // self.district_id = event;
+    },
     logOut() {
       this.$store.dispatch("auth/logout");
       this.$router.push("/login");
@@ -237,11 +304,6 @@ export default {
   beforeDestroy() {
     EventBus.remove("logout");
   },
-  beforeMount() {
-    if (this.$route.query.tab === "mapView") {
-      this.showNavelement = true;
-    }
-  },
   watch: {
     $route: function () {
       // Check if given route is true, if it is then hide Nav.
@@ -250,7 +312,20 @@ export default {
       } else {
         this.showNavelement = false;
       }
+      if (/add/.test(window.location.href)) {
+        this.showNavmethod = false;
+      } else {
+        this.showNavmethod = true;
+      }
     },
   },
 };
 </script>
+<style scoped>
+/* header {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 99999 !important;
+} */
+</style>
