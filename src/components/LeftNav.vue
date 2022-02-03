@@ -2,9 +2,10 @@
   <v-card>
     <v-navigation-drawer
       v-model="drawer"
-      app
-      absolute
+      fixed
+      bottom
       temporary
+      app
       style="z-index: 200 !important"
     >
       <!-- <v-navigation-drawer
@@ -24,6 +25,7 @@
       'max-height': `calc(100% - 76px) !important`,
     }" -->
       <!-- expand-on-hover -->
+      <v-divider class="mt-0"></v-divider>
       <v-list v-if="!currentUser">
         <v-list-item
           v-for="item in menuItems"
@@ -177,6 +179,11 @@
       </v-list>
     </v-navigation-drawer>
     <v-app-bar flat app>
+      <v-img
+        class="mta-logo mx-auto"
+        src="../assets/logo.png"
+        alt="MTA logo"
+      ></v-img>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </v-app-bar>
   </v-card>
@@ -322,10 +329,10 @@ export default {
 };
 </script>
 <style scoped>
-/* header {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  z-index: 99999 !important;
-} */
+.mta-logo {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  left: 50%;
+}
 </style>
