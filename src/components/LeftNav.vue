@@ -258,6 +258,14 @@ export default {
   },
   methods: {
     handleCityChange(event) {
+      bus.$emit("cityChanged", event);
+      this.scaleControls.filter((item) => {
+        if (item.name === "iller") {
+          item.checked = true;
+        } else {
+          item.checked = false;
+        }
+      });
       this.cities.filter((elem) => {
         if (elem.il === event) {
           this.fillDistrict = elem.ilceleri;

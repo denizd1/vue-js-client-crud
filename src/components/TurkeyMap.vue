@@ -77,6 +77,7 @@ import { ProfilePlotter } from "../common/ProfilePlotter.js";
 import http from "../http-common";
 import { Icon, icon } from "leaflet";
 import { bus } from "../main";
+// import * as L from "leaflet";
 
 import citiesLatLongjson from "../data/cities_of_turkey.json";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -86,6 +87,7 @@ delete Icon.Default.prototype._getIconUrl;
 function onEachFeature(feature, layer) {
   var v = this;
   if (feature.properties.mytag && feature.properties.mytag == "Cities") {
+    layer._leaflet_id = feature.properties.name;
     layer.on("click", function (e) {
       document.querySelectorAll(".leaflet-interactive").forEach((el) => {
         el.classList.add("pseudoClass");
@@ -306,6 +308,9 @@ export default {
     },
   },
   mounted() {
+    this.$nextTick(() => {
+      this.map = this.$refs.map.mapObject; // work as expected
+    });
     bus.$on("renderMap", () => {
       setTimeout(() => {
         if (this.$refs.map) {
@@ -314,6 +319,17 @@ export default {
         }
       }, 100);
     });
+    bus.$on("cityChanged", (city) => {
+      if (this.$refs.map) {
+        this.scaleService(0);
+        setTimeout(() => {
+          this.map._layers[city]._path.classList.add("selected");
+          this.dataService(city);
+          this.$emit("searchParam", city);
+        }, 100);
+      }
+    });
+
     bus.$on("fireScalechange", (val) => {
       this.changeScale(val);
     });

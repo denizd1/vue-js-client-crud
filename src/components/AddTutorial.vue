@@ -1,6 +1,11 @@
 <template>
   <v-row>
-    <v-col cols="12" align="center" class="list mx-auto list" v-if="!submitted">
+    <v-col
+      cols="12"
+      align="center"
+      class="contentsize mx-auto"
+      v-if="!submitted"
+    >
       <!-- <p class="headline">Proje Ekle</p> -->
 
       <v-tabs centered v-model="tab">
@@ -123,15 +128,17 @@
         </v-tab-item>
       </v-tabs-items>
     </v-col>
-    <v-col cols="6" align="center" class="list mx-auto" v-else>
-      <v-card class="mx-auto">
-        <v-card-title> Proje(ler) Başarıyla Eklendi! </v-card-title>
+    <v-col cols="12" align="center" class="list mx-auto" v-else>
+      <v-card>
+        <v-card-title class="justify-center">
+          Proje(ler) Başarıyla Eklendi!
+        </v-card-title>
 
         <v-card-subtitle>
           Yeni bir proje eklemek için 'Ekle' butonuna basın.
         </v-card-subtitle>
 
-        <v-card-actions>
+        <v-card-actions class="justify-center">
           <v-btn color="success" @click="newTutorial">Ekle</v-btn>
         </v-card-actions>
       </v-card>
@@ -562,13 +569,8 @@ export default {
 </script>
 
 <style>
-.submit-form {
-  max-width: 400px;
-  position: relative;
-  z-index: 4;
-}
-.list {
-  max-width: 800px;
+.contentsize {
+  max-width: 500px;
   position: relative;
   z-index: 4;
 }
