@@ -1,82 +1,176 @@
 <template>
-  <div v-if="currentTutorial" class="edit-form py-3">
-    <p class="headline">Edit Tutorial</p>
+  <v-col v-if="currentTutorial" class="edit-form mx-auto py-3" cols="4">
+    <p class="headline">Çalışmayı Düzenle</p>
 
     <v-form ref="form" lazy-validation>
       <v-text-field
-        v-model="currentTutorial.title"
-        :rules="[(v) => !!v || 'Title is required']"
-        label="Title"
+        class="pb-2"
+        v-for="(val, key, index) in notNullcurrentTutorial"
+        v-model="notNullcurrentTutorial[key]"
+        :key="index"
+        :label="key"
+        :rules="[(v) => !!v || 'Bu alan boş bırakılamaz.']"
         required
       ></v-text-field>
 
-      <v-text-field
-        v-model="currentTutorial.description"
-        :rules="[(v) => !!v || 'Description is required']"
-        label="Description"
-        required
-      ></v-text-field>
-
-      <v-text-field
-        v-model="currentTutorial.details"
-        :rules="[(v) => !!v || 'Details is required']"
-        label="Details"
-        required
-      ></v-text-field>
-
-      <label><strong>Status:</strong></label>
-      {{ currentTutorial.published ? "Published" : "Pending" }}
+      <label><strong>Durum:</strong></label>
+      {{ notNullcurrentTutorial.published ? "Yayında" : "Beklemede" }}
 
       <v-divider class="my-5"></v-divider>
 
-      <v-btn v-if="currentTutorial.published"
+      <v-btn
+        v-if="currentTutorial.published"
         @click="updatePublished(false)"
-        color="primary" small class="mr-2"
+        color="primary"
+        small
+        class="mr-2"
       >
-        UnPublish
+        Yayından Kaldır
       </v-btn>
 
-      <v-btn v-else
+      <v-btn
+        v-else
         @click="updatePublished(true)"
-        color="primary" small class="mr-2"
+        color="primary"
+        small
+        class="mr-2"
       >
-        Publish
+        Yayınla
       </v-btn>
 
       <v-btn color="error" small class="mr-2" @click="deleteTutorial">
-        Delete
+        Sil
       </v-btn>
 
-      <v-btn color="success" small @click="updateTutorial">
-        Update
-      </v-btn>
+      <v-btn color="success" small @click="updateTutorial"> Güncelle </v-btn>
     </v-form>
 
     <p class="mt-3">{{ message }}</p>
-  </div>
-
-  <div v-else>
-    <p>Please click on a Tutorial...</p>
-  </div>
+  </v-col>
 </template>
 
 <script>
 import TutorialDataService from "../services/TutorialDataService";
-
+import _ from "lodash";
 export default {
   name: "tutorial",
   data() {
     return {
       currentTutorial: null,
+      notNullcurrentTutorial: null,
       message: "",
+      headers: [
+        "",
+        "Nokta/Kuyu/Profil Adı",
+        "Yöntem",
+        "Alt Yöntem",
+        "Çalışma Amacı",
+        "Satılabilirlik",
+        "Ham Veri",
+        "Çalışma Tarihi",
+        "Proje Kodu",
+        "Kuyu Arşiv No",
+        "Jeofizik Arşiv No",
+        "Derleme No",
+        "CD No",
+        "İl",
+        "İlçe",
+        "x",
+        "y",
+        "z",
+        "Profil Başlangıç (x)",
+        "Profil Başlangıç (y)",
+        "Profil Bitiş (x)",
+        "Profil Bitiş (y)",
+        "Zone",
+        "Datum",
+        "1/500000",
+        "1/100000",
+        "1/25000",
+        "Ölçülen Parametre(ler)",
+        "Açılım Yönü",
+        "Açılım Yöntemi",
+        "Frekans Aralığı",
+        "MT Ölçü Süresi (saat)",
+        "Z Bileşeni",
+        "AMT Ölçüsü",
+        "AMT Ölçü Süresi",
+        "TEM Ölçüsü",
+        "Kalibrasyon Dosyası",
+        "Veri Formatı",
+        "Derinlik (m) - AB/2 (m)",
+        "Derinlik (m) GR",
+        "Derinlik (m) NEU",
+        "Derinlik (m) DEN",
+        "Derinlik (m) RES",
+        "Derinlik (m) SP",
+        "Derinlik (m) CAL",
+        "Derinlik (m) TERM",
+        "Derinlik (m) SGR",
+        "Derinlik (m) CBL",
+        "Derinlik (m) SON",
+        "Derinlik (m) CCL",
+        "Hat Boyu (m)",
+        "Kayıt Boyu (sn)",
+        "Sweep Süresi (sn)",
+        "Sweep Tipi",
+        "Sweep Sayısı",
+        "Sweep Frekansları (hz)",
+        "Sweep Taper (ms)",
+        "Yayım Tipi",
+        "Offset (m)",
+        "Jeofon Dizilimi",
+        "Grup Aralığı (m)",
+        "Atış Aralığı (m)",
+        "Örnekleme Aralığı (ms)",
+        "Ekipman",
+        "Enerji Kaynağı",
+        "Km^2",
+        "Profil Boyu (km)",
+        "Elektrot Aralığı",
+        "Dizilim Türü",
+        "Seviye Sayısı",
+        "Profil Aralığı",
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "Ölçü Karne No",
+        "Dış Loop Boyutu",
+        "",
+        "",
+      ],
     };
   },
   methods: {
+    filterCurrenttutorial() {
+      return _.omitBy(
+        this.currentTutorial,
+        (v) => _.isUndefined(v) || _.isNull(v) || v === ""
+      );
+    },
+    renameKeys(obj) {
+      var keys = Object.keys(obj);
+      var newObj = {};
+      for (let index = 0; index < keys.length; index++) {
+        newObj[this.headers[index]] = obj[keys[index]]
+          ? obj[keys[index]]
+          : null;
+      }
+      return newObj;
+    },
     getTutorial(id) {
       TutorialDataService.get(id)
         .then((response) => {
-          this.currentTutorial = response.data;
-          console.log(response.data);
+          var responseData = this.renameKeys(response.data);
+          this.currentTutorial = Object.keys(responseData)
+            .slice(1, -3)
+            .reduce((result, key) => {
+              result[key] = responseData[key];
+
+              return result;
+            }, {});
+          this.notNullcurrentTutorial = this.filterCurrenttutorial();
         })
         .catch((e) => {
           console.log(e);
@@ -125,17 +219,25 @@ export default {
     },
   },
   mounted() {
-    this.message = "";
     this.getTutorial(this.$route.params.id);
   },
+  // beforeRouteEnter(to, from, next) {
+  //   next((vm) => {
+  //     if (vm.$store.state.auth.user) {
+  //       vm.getTutorial(vm.$route.params.id);
+  //       vm.notNullcurrentTutorial = vm.filterCurrenttutorial();
+  //     } else {
+  //       next({ name: "login" });
+  //     }
+  //   });
+  // },
 };
 </script>
 
 <style>
 .edit-form {
-  max-width: 300px;
-  margin: auto;
   position: relative;
-  z-index: 99;
+  z-index: 1;
+  min-height: 100%;
 }
 </style>

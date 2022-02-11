@@ -54,6 +54,29 @@
             :imperial="false"
             :metric="true"
           ></l-control-scale>
+          <l-control :position="'bottomleft'">
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header> Lejant </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-card
+                    v-for="(legendElement, index) in legend"
+                    :key="index"
+                    class="pa-2"
+                    align="left"
+                    tile
+                  >
+                    <img
+                      :src="require(`@/assets` + legendElement.icon)"
+                      height="20"
+                      width="20"
+                    />
+                    <small class="pl-3">{{ legendElement.text }}</small>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </l-control>
         </l-map>
       </v-col>
     </v-row>
@@ -72,6 +95,7 @@ import {
   LControlScale,
   LIconDefault,
   LPopup,
+  LControl,
 } from "vue2-leaflet";
 import { ProfilePlotter } from "../common/ProfilePlotter.js";
 import http from "../http-common";
@@ -123,6 +147,7 @@ export default {
     LPolyline,
     LGeoJson,
     LControlScale,
+    LControl,
     "v-marker-cluster": Vue2LeafletMarkerCluster,
     "v-marker": LMarker,
     "v-icondefault": LIconDefault,
@@ -138,7 +163,7 @@ export default {
       citiesLatLongjson: citiesLatLongjson,
       zoom: 6,
       loading: false,
-      center: [39.750359, 37.015598],
+      center: [39.9208, 32.8541],
       url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
       attribution:
         'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
@@ -154,6 +179,32 @@ export default {
       selectedMethod: null,
       selectedCityparam: null,
       selectedJsonparam: null,
+      legend: [
+        {
+          text: "Elektrik ve Elektromanyetik Yöntemler",
+          icon: "/battery.png",
+        },
+        {
+          text: "Gravite",
+          icon: "/gravity.png",
+        },
+        {
+          text: "Manyetik",
+          icon: "/magnetic-field.png",
+        },
+        {
+          text: "Radyometri",
+          icon: "/radiation-detector.png",
+        },
+        {
+          text: "Sismik Yöntemler",
+          icon: "/seismic.png",
+        },
+        {
+          text: "Kuyu Ölçüleri",
+          icon: "/drilling-rig.png",
+        },
+      ],
     };
   },
   methods: {
@@ -254,7 +305,6 @@ export default {
           this.generateIcon(iconUrl, shadowUrl);
         }
         if (params.altyontem == "Radyometri") {
-          // ../assets/radiation-detector.png
           Icon.Default.mergeOptions({
             iconRetinaUrl: require("../assets/radiation-detector.png"),
             iconUrl: require("../assets/radiation-detector.png"),
@@ -289,7 +339,7 @@ export default {
   },
   watch: {
     geojson: function () {
-      this.$refs.map.setCenter([39.750359, 37.015598]);
+      this.$refs.map.setCenter([39.9208, 32.8541]);
       this.$refs.map.setZoom(6);
     },
     deep: true,
