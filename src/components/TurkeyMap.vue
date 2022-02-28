@@ -383,8 +383,12 @@ export default {
     bus.$on("fireScalechange", (val) => {
       this.changeScale(val);
     });
-    bus.$on("methodParam", (data) => {
-      this.getselectedMethod(data);
+    bus.$on("methodParam", (name, checked) => {
+      if (checked === true) {
+        this.getselectedMethod(name);
+      } else {
+        this.getselectedMethod(null);
+      }
     });
     bus.$on("hideGeojson", (data) => {
       this.showGeojson = data;

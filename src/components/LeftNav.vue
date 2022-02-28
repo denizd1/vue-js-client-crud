@@ -133,7 +133,7 @@
               v-for="(geoMethods, index) in methodSelect"
               :key="index"
               link
-              @click="handleMethodChange(geoMethods.name)"
+              @click="handleMethodChange(geoMethods.name, geoMethods.checked)"
             >
               <v-list-item-title v-text="geoMethods.name"> </v-list-item-title>
 
@@ -147,6 +147,7 @@
           prepend-icon="mdi-city-variant-outline"
           :value="false"
           no-action
+          v-if="showNavcity"
         >
           <template v-slot:activator>
             <v-list-item-content>
@@ -204,6 +205,7 @@ export default {
       drawer: false,
       showNavelement: null,
       showNavmethod: null,
+      showNavcity: null,
       menuItems: [
         {
           title: "Kaydol",
@@ -290,8 +292,8 @@ export default {
         bus.$emit("hideGeojson", false);
       }
     },
-    handleMethodChange(name) {
-      bus.$emit("methodParam", name);
+    handleMethodChange(name, checked) {
+      bus.$emit("methodParam", name, checked);
     },
   },
   computed: {
@@ -327,10 +329,12 @@ export default {
       } else {
         this.showNavelement = false;
       }
-      if (/add/.test(window.location.href)) {
+      if (!/tutorials-list/.test(window.location.href)) {
         this.showNavmethod = false;
+        this.showNavcity = false;
       } else {
         this.showNavmethod = true;
+        this.showNavcity = true;
       }
     },
   },

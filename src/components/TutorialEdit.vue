@@ -3,18 +3,26 @@
     <p class="headline">Çalışmayı Düzenle</p>
 
     <v-form ref="form" lazy-validation>
-      <v-text-field
-        class="pb-2"
-        v-for="(val, key, index) in notNullcurrentTutorial"
-        v-model="notNullcurrentTutorial[key]"
-        :key="index"
-        :label="key"
-        :rules="[(v) => !!v || 'Bu alan boş bırakılamaz.']"
-        required
-      ></v-text-field>
+      <template v-for="(val, key, index) in currentTutorial">
+        <v-text-field
+          class="pb-2"
+          v-if="
+            val !== null &&
+            key !== 'id' &&
+            key !== 'published' &&
+            key !== 'createdAt' &&
+            key !== 'updatedAt'
+          "
+          v-model="currentTutorial[key]"
+          :key="index"
+          :label="headers[index]"
+          :rules="[(v) => !!v || 'Bu alan boş bırakılamaz.']"
+          required
+        ></v-text-field>
+      </template>
 
       <label><strong>Durum:</strong></label>
-      {{ notNullcurrentTutorial.published ? "Yayında" : "Beklemede" }}
+      {{ currentTutorial.published ? "Yayında" : "Beklemede" }}
 
       <v-divider class="my-5"></v-divider>
 
@@ -51,16 +59,15 @@
 
 <script>
 import TutorialDataService from "../services/TutorialDataService";
-import _ from "lodash";
+// import _ from "lodash";
 export default {
   name: "tutorial",
   data() {
     return {
       currentTutorial: null,
-      notNullcurrentTutorial: null,
       message: "",
       headers: [
-        "",
+        "id",
         "Nokta/Kuyu/Profil Adı",
         "Yöntem",
         "Alt Yöntem",
@@ -137,40 +144,34 @@ export default {
         "A4",
         "Ölçü Karne No",
         "Dış Loop Boyutu",
-        "",
-        "",
+        "published",
+        "createdAt",
+        "updatedAt",
       ],
     };
   },
   methods: {
-    filterCurrenttutorial() {
-      return _.omitBy(
-        this.currentTutorial,
-        (v) => _.isUndefined(v) || _.isNull(v) || v === ""
-      );
-    },
-    renameKeys(obj) {
-      var keys = Object.keys(obj);
-      var newObj = {};
-      for (let index = 0; index < keys.length; index++) {
-        newObj[this.headers[index]] = obj[keys[index]]
-          ? obj[keys[index]]
-          : null;
-      }
-      return newObj;
-    },
+    // filterCurrenttutorial() {
+    //   return _.omitBy(
+    //     this.modifyTutorial,
+    //     (v) => _.isUndefined(v) || _.isNull(v) || v === ""
+    //   );
+    // },
+    // renameKeys(obj) {
+    //   var keys = Object.keys(obj);
+    //   var newObj = {};
+    //   for (let index = 0; index < keys.length; index++) {
+    //     newObj[this.headers[index]] = obj[keys[index]]
+    //       ? obj[keys[index]]
+    //       : null;
+    //   }
+    //   return newObj;
+    // },
     getTutorial(id) {
       TutorialDataService.get(id)
         .then((response) => {
-          var responseData = this.renameKeys(response.data);
-          this.currentTutorial = Object.keys(responseData)
-            .slice(1, -3)
-            .reduce((result, key) => {
-              result[key] = responseData[key];
-
-              return result;
-            }, {});
-          this.notNullcurrentTutorial = this.filterCurrenttutorial();
+          this.currentTutorial = response.data;
+          console.log(response.data);
         })
         .catch((e) => {
           console.log(e);
@@ -200,7 +201,7 @@ export default {
       TutorialDataService.update(this.currentTutorial.id, this.currentTutorial)
         .then((response) => {
           console.log(response.data);
-          this.message = "The tutorial was updated successfully!";
+          this.message = "İçerik Başarıyla Güncellendi";
         })
         .catch((e) => {
           console.log(e);

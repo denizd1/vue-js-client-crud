@@ -6,8 +6,6 @@
       class="contentsize mx-auto"
       v-if="!submitted"
     >
-      <!-- <p class="headline">Proje Ekle</p> -->
-
       <v-tabs centered v-model="tab">
         <v-tab href="#addManual">Proje Oluştur</v-tab>
         <v-tab href="#importExcel">Excel Import</v-tab>
@@ -54,19 +52,6 @@
               required
             ></v-text-field>
 
-            <!-- <v-text-field
-          v-model="tutorial.description"
-          :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
-          label="İl"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model="tutorial.details"
-          :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
-          label="İlçe"
-          required
-        ></v-text-field> -->
             <v-menu
               ref="menu"
               v-model="menu"

@@ -224,6 +224,7 @@ export default {
       TutorialDataService.getAll(params)
         .then((response) => {
           const { tutorials, totalPages } = response.data;
+          console.log(tutorials);
           this.tutorials = tutorials.map(this.getDisplayTutorial);
           this.totalPages = totalPages;
         })
