@@ -113,6 +113,7 @@ export default {
       pageSize: 5,
       pageSizes: [5, 10, 15],
       selectedCity: null,
+      selectedDistrict: null,
       componentKey: 0,
     };
   },
@@ -191,17 +192,26 @@ export default {
     reloadMap() {
       bus.$emit("renderMap");
     },
-    getSelectedcity(val) {
-      this.selectedCity = val;
+    getSelectedcity(val, flag) {
+      if (flag === "il") {
+        this.selectedCity = val;
+      }
+      if (flag === "ilce") {
+        this.selectedDistrict = val;
+      }
     },
     getRequestParams(searchTitle, page, pageSize) {
+      console.log(this.selectedDistrict);
       let params = {};
       if (this.selectedCity != null) {
         searchTitle = this.selectedCity;
         this.searchTitle = this.selectedCity;
-      }
-      if (searchTitle) {
         params["il"] = searchTitle;
+      }
+      if (this.selectedDistrict != null) {
+        searchTitle = this.selectedDistrict;
+        this.searchTitle = this.selectedDistrict;
+        params["ilce"] = searchTitle;
       }
 
       if (page) {

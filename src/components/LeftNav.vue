@@ -132,12 +132,16 @@
             <v-list-item
               v-for="(geoMethods, index) in methodSelect"
               :key="index"
-              link
-              @click="handleMethodChange(geoMethods.name, geoMethods.checked)"
             >
               <v-list-item-title v-text="geoMethods.name"> </v-list-item-title>
 
-              <v-checkbox style="z-index: 89" v-model="geoMethods.checked">
+              <v-checkbox
+                style="z-index: 89"
+                @change="
+                  handleMethodChange(geoMethods.name, geoMethods.checked)
+                "
+                v-model="geoMethods.checked"
+              >
               </v-checkbox>
             </v-list-item>
           </v-list>
@@ -173,6 +177,7 @@
                 :items="fillDistrict"
                 single-line
                 placeholder="İlçe seçiniz"
+                @change="handleDistrictChange"
               ></v-select>
             </v-list-item>
           </v-list>
@@ -206,6 +211,8 @@ export default {
       showNavelement: null,
       showNavmethod: null,
       showNavcity: null,
+      citytoEmit: null,
+      districtToEmit: null,
       menuItems: [
         {
           title: "Kaydol",
@@ -261,6 +268,7 @@ export default {
   methods: {
     handleCityChange(event) {
       bus.$emit("cityChanged", event);
+      this.citytoEmit = event;
       this.scaleControls.filter((item) => {
         if (item.name === "iller") {
           item.checked = true;
@@ -275,6 +283,17 @@ export default {
       });
       // var self = this;
       // self.district_id = event;
+    },
+    handleDistrictChange(event) {
+      this.districtToEmit = event;
+      bus.$emit("districtChanged", this.citytoEmit, event);
+      this.scaleControls.filter((item) => {
+        if (item.name === "iller") {
+          item.checked = true;
+        } else {
+          item.checked = false;
+        }
+      });
     },
     logOut() {
       this.$store.dispatch("auth/logout");
@@ -293,7 +312,14 @@ export default {
       }
     },
     handleMethodChange(name, checked) {
-      bus.$emit("methodParam", name, checked);
+      console.log(checked);
+      bus.$emit(
+        "methodParam",
+        name,
+        checked,
+        this.citytoEmit,
+        this.districtToEmit
+      );
     },
   },
   computed: {

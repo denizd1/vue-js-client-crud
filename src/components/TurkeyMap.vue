@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-row>
       <v-col cols="12" style="height: 600px; width: 100%; z-index: 99">
         <l-map
@@ -123,7 +123,7 @@ function onEachFeature(feature, layer) {
       e.originalEvent.target.classList.remove("pseudoClass");
       v.$emit("searchParam", this.feature.properties.name);
       v.selectedCityparam = this.feature.properties.name;
-      v.dataService(this.feature.properties.name, v.selectedMethod);
+      v.dataService(this.feature.properties.name, null, v.methodarr);
     });
     layer.on("mouseover", function (e) {
       document
@@ -176,7 +176,8 @@ export default {
       showGeojson: false,
       searchParam: null,
       options: { onEachFeature: onEachFeature.bind(this) },
-      selectedMethod: null,
+
+      methodarr: [],
       selectedCityparam: null,
       selectedJsonparam: null,
       legend: [
@@ -208,10 +209,6 @@ export default {
     };
   },
   methods: {
-    getselectedMethod(val) {
-      this.selectedMethod = val;
-      this.dataService(this.selectedCityparam, this.selectedMethod);
-    },
     handlePopupClick(val) {
       let routeData = this.$router.resolve({
         name: "tutorial",
@@ -219,11 +216,12 @@ export default {
       });
       window.open(routeData.href, "_blank");
     },
-    dataService(city, selectedMethod) {
+    dataService(city, district, selectedMethod) {
       let params = {};
       this.polyline = [];
       this.markers = [];
       params["il"] = city;
+      params["ilce"] = district;
       params["yontem"] = selectedMethod;
       TutorialDataService.findAllgetAll(params)
         .then((response) => {
@@ -374,8 +372,18 @@ export default {
         this.scaleService(0);
         setTimeout(() => {
           this.map._layers[city]._path.classList.add("selected");
-          this.dataService(city);
-          this.$emit("searchParam", city);
+          this.dataService(city, null, this.methodarr);
+          this.$emit("searchParam", city, "il");
+        }, 100);
+      }
+    });
+    bus.$on("districtChanged", (city, district) => {
+      if (this.$refs.map) {
+        this.scaleService(0);
+        setTimeout(() => {
+          this.map._layers[city]._path.classList.add("selected");
+          this.dataService(city, district, this.methodarr);
+          this.$emit("searchParam", district, "ilce");
         }, 100);
       }
     });
@@ -383,12 +391,17 @@ export default {
     bus.$on("fireScalechange", (val) => {
       this.changeScale(val);
     });
-    bus.$on("methodParam", (name, checked) => {
+    bus.$on("methodParam", (name, checked, city, district) => {
+      console.log(checked);
       if (checked === true) {
-        this.getselectedMethod(name);
+        if (!this.methodarr.includes(name)) {
+          this.methodarr.push(name);
+        }
       } else {
-        this.getselectedMethod(null);
+        this.methodarr = this.methodarr.filter((e) => e !== name);
       }
+      this.dataService(city, district, this.methodarr);
+      console.log(this.methodarr);
     });
     bus.$on("hideGeojson", (data) => {
       this.showGeojson = data;
