@@ -94,7 +94,6 @@
             <v-list-item
               v-for="(scaleControl, index) in scaleControls"
               :key="index"
-              link
             >
               <v-list-item-title v-text="scaleControl.label">
               </v-list-item-title>
@@ -104,7 +103,7 @@
                 :color="scaleControl.color"
                 :input-value="scaleControl.factor"
                 :disabled="scaleControl.visibility"
-                @click="
+                @change="
                   triggerChange(
                     $event,
                     scaleControl.checked,
@@ -312,7 +311,6 @@ export default {
       }
     },
     handleMethodChange(name, checked) {
-      console.log(checked);
       bus.$emit(
         "methodParam",
         name,
@@ -371,6 +369,6 @@ export default {
   width: 50px;
   height: 50px;
   position: absolute;
-  left: 50%;
+  left: 45%;
 }
 </style>

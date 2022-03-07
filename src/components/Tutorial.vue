@@ -1,20 +1,13 @@
 <template>
-  <div v-if="currentTutorial" class="py-3">
-    <div class="row">
-      <div class="col-4 table-responsive" style="z-index: 4">
-        <detail-table :currentTutorial="currentTutorial"></detail-table>
-      </div>
-      <div class="col-8" style="z-index: 4">
-        <map-view :currentTutorial="currentTutorial"></map-view>
-      </div>
-      <!-- <v-card-actions style="z-index: 99">
-        <v-btn color="success" @click="print">Yazdir</v-btn>
-      </v-card-actions> -->
-    </div>
-  </div>
-  <!-- <div v-else>
-      Yukleniyor
-  </div> -->
+  <v-row v-if="currentTutorial" class="py-3 px-10">
+    <v-col cols="12" md="4" style="z-index: 4">
+      <detail-table :currentTutorial="currentTutorial"></detail-table>
+    </v-col>
+
+    <v-col cols="12" md="8" style="z-index: 4">
+      <map-view :currentTutorial="currentTutorial"></map-view>
+    </v-col>
+  </v-row>
 </template>
 
 <script>

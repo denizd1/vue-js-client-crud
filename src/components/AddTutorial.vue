@@ -1,134 +1,127 @@
 <template>
-  <v-row>
-    <v-col
-      cols="12"
-      align="center"
-      class="contentsize mx-auto"
-      v-if="!submitted"
-    >
-      <v-tabs centered v-model="tab">
-        <v-tab href="#addManual">Proje Oluştur</v-tab>
-        <v-tab href="#importExcel">Excel Import</v-tab>
-      </v-tabs>
-      <v-tabs-items v-model="tab">
-        <v-tab-item :key="1" value="addManual">
-          <v-form class="mr-3 ml-3" ref="form" lazy-validation>
-            <v-select
-              item-text="yontemAdi"
-              placeholder="Bir jeofizik yöntem seçiniz"
-              :items="methodSubmethod"
-              single-line
-              @change="handleChange"
-            >
-            </v-select>
-            <v-select
-              v-if="fillSubMethod.length"
-              item-text="altYontemler"
-              :items="fillSubMethod"
-              placeholder="Bir alt yöntem seçiniz"
-              single-line
-            ></v-select>
-
-            <v-select
-              item-text="il"
-              :items="cities"
-              single-line
-              placeholder="İl Seçiniz"
-              @change="handleCityChange"
-            ></v-select>
-
-            <v-select
-              v-if="fillDistrict.length"
-              item-text="ilceleri"
-              :items="fillDistrict"
-              single-line
-              placeholder="İlçe seçiniz"
-            ></v-select>
-
-            <v-text-field
-              v-model="tutorial.title"
-              :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
-              label="Nokta Adı"
-              required
-            ></v-text-field>
-
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="date"
-                  label="Çalışma Tarihi"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="date"
-                :active-picker.sync="activePicker"
-                :max="
-                  new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-                    .toISOString()
-                    .substr(0, 10)
-                "
-                min="1950-01-01"
-                locale="tr"
-                @change="save"
-              ></v-date-picker>
-            </v-menu>
-            <v-btn color="primary" class="mt-3" @click="saveTutorial"
-              >Kaydet</v-btn
-            >
-          </v-form>
-        </v-tab-item>
-        <v-tab-item :key="2" value="importExcel">
-          <div class="mt-3 mr-3 ml-3">
-            <label for="formFile" class="form-label"
-              >Yüklemek için xls ya da xlsx uzantılı bir Excel dosyası
-              seçin.</label
-            >
-            <input
-              class="form-control"
-              type="file"
-              id="formFile"
-              @change="importExcel"
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            />
-          </div>
-          <div class="mt-3 mr-3 ml-3" v-show="show">
-            {{ message }}
-          </div>
-          <!-- <input type="file" @change="importExcel" accept=".csv" /> -->
-          <!-- accept=".csv" -->
-          <v-btn color="primary" class="mt-3 mr-3 ml-3" @click="dataImporter"
-            >Excel Import</v-btn
+  <v-col cols="12" align="center" class="contentsize mx-auto" v-if="!submitted">
+    <v-tabs centered v-model="tab">
+      <v-tab href="#addManual">Proje Oluştur</v-tab>
+      <v-tab href="#importExcel">Excel Import</v-tab>
+    </v-tabs>
+    <v-tabs-items v-model="tab">
+      <v-tab-item :key="1" value="addManual">
+        <v-form class="mr-3 ml-3" ref="form" lazy-validation>
+          <v-select
+            item-text="yontemAdi"
+            placeholder="Bir jeofizik yöntem seçiniz"
+            :items="methodSubmethod"
+            single-line
+            @change="handleChange"
           >
-        </v-tab-item>
-      </v-tabs-items>
-    </v-col>
-    <v-col cols="12" align="center" class="list mx-auto" v-else>
-      <v-card>
-        <v-card-title class="justify-center">
-          Proje(ler) Başarıyla Eklendi!
-        </v-card-title>
+          </v-select>
+          <v-select
+            v-if="fillSubMethod.length"
+            item-text="altYontemler"
+            :items="fillSubMethod"
+            placeholder="Bir alt yöntem seçiniz"
+            single-line
+          ></v-select>
 
-        <v-card-subtitle>
-          Yeni bir proje eklemek için 'Ekle' butonuna basın.
-        </v-card-subtitle>
+          <v-select
+            item-text="il"
+            :items="cities"
+            single-line
+            placeholder="İl Seçiniz"
+            @change="handleCityChange"
+          ></v-select>
 
-        <v-card-actions class="justify-center">
-          <v-btn color="success" @click="newTutorial">Ekle</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+          <v-select
+            v-if="fillDistrict.length"
+            item-text="ilceleri"
+            :items="fillDistrict"
+            single-line
+            placeholder="İlçe seçiniz"
+          ></v-select>
+
+          <v-text-field
+            v-model="tutorial.title"
+            :rules="[(v) => !!v || 'Bu alan boş bırakılamaz']"
+            label="Nokta Adı"
+            required
+          ></v-text-field>
+
+          <v-menu
+            ref="menu"
+            v-model="menu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="date"
+                label="Çalışma Tarihi"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="date"
+              :active-picker.sync="activePicker"
+              :max="
+                new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+                  .toISOString()
+                  .substr(0, 10)
+              "
+              min="1950-01-01"
+              locale="tr"
+              @change="save"
+            ></v-date-picker>
+          </v-menu>
+          <v-btn color="primary" class="mt-3" @click="saveTutorial"
+            >Kaydet</v-btn
+          >
+        </v-form>
+      </v-tab-item>
+      <v-tab-item :key="2" value="importExcel">
+        <div class="mt-3 mr-3 ml-3">
+          <label for="formFile" class="form-label"
+            >Yüklemek için xls ya da xlsx uzantılı bir Excel dosyası
+            seçin.</label
+          >
+          <input
+            class="form-control"
+            type="file"
+            id="formFile"
+            @change="importExcel"
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          />
+        </div>
+        <div class="mt-3 mr-3 ml-3" v-show="show">
+          {{ message }}
+        </div>
+        <!-- <input type="file" @change="importExcel" accept=".csv" /> -->
+        <!-- accept=".csv" -->
+        <v-btn color="primary" class="mt-3 mr-3 ml-3" @click="dataImporter"
+          >Excel Import</v-btn
+        >
+      </v-tab-item>
+    </v-tabs-items>
+  </v-col>
+  <v-col cols="12" align="center" class="list mx-auto" v-else>
+    <v-card>
+      <v-card-title class="justify-center">
+        Proje(ler) Başarıyla Eklendi!
+      </v-card-title>
+
+      <v-card-subtitle>
+        Yeni bir proje eklemek için 'Ekle' butonuna basın.
+      </v-card-subtitle>
+
+      <v-card-actions class="justify-center">
+        <v-btn color="success" @click="newTutorial">Ekle</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-col>
 </template>
 
 <script>
@@ -436,7 +429,6 @@ export default {
 
           data[key] = val; // key - value
         });
-        console.log("data", data);
         TutorialDataService.create(data)
           .then((response) => {
             this.tutorial.id = response.data.id;

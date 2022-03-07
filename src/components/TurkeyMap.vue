@@ -1,86 +1,82 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12" style="height: 600px; width: 100%; z-index: 99">
-        <l-map
-          v-if="showMap"
-          ref="map"
-          :zoom="zoom"
-          :no-blocking-animations="true"
-          :center="center"
-          :options="mapOptions"
-          style="height: 80%"
-          @update:center="centerUpdate"
-          @update:zoom="zoomUpdate"
-        >
-          <v-icondefault></v-icondefault>
-          <l-tile-layer :url="url" :attribution="attribution" />
-          <!-- <l-marker
+  <v-col cols="12" style="height: 500px; width: 100%">
+    <l-map
+      v-if="showMap"
+      ref="map"
+      :zoom="zoom"
+      :no-blocking-animations="true"
+      :center="center"
+      :options="mapOptions"
+      style="height: 100%"
+      @update:center="centerUpdate"
+      @update:zoom="zoomUpdate"
+    >
+      <v-icondefault></v-icondefault>
+      <l-tile-layer :url="url" :attribution="attribution" />
+      <!-- <l-marker
             ref="marker"
             v-if="withTooltip != null"
             :lat-lng="withTooltip"
           /> -->
-          <v-marker-cluster>
-            <v-marker
-              v-for="marker in markers"
-              :key="marker.id"
-              :lat-lng="marker.latlng"
-              :icon="icon"
-              :class="$style.baz"
-            >
-              <v-popup>
-                <button @click="handlePopupClick(marker.id)">
-                  {{ marker.text }}
-                </button>
-              </v-popup>
-            </v-marker>
-          </v-marker-cluster>
-          <l-polyline
-            v-for="(line, index) in polyline"
-            :key="index"
-            :lat-lngs="line.latlngs"
-            :color="line.color"
-          />
+      <v-marker-cluster>
+        <v-marker
+          v-for="marker in markers"
+          :key="marker.id"
+          :lat-lng="marker.latlng"
+          :icon="icon"
+          :class="$style.baz"
+        >
+          <v-popup>
+            <button @click="handlePopupClick(marker.id)">
+              {{ marker.text }}
+            </button>
+          </v-popup>
+        </v-marker>
+      </v-marker-cluster>
+      <l-polyline
+        v-for="(line, index) in polyline"
+        :key="index"
+        :lat-lngs="line.latlngs"
+        :color="line.color"
+      />
 
-          <l-geo-json
-            v-if="showGeojson"
-            :geojson="geojson"
-            :options="options"
-            :options-style="styleFunction"
-          />
+      <l-geo-json
+        v-if="showGeojson"
+        :geojson="geojson"
+        :options="options"
+        :options-style="styleFunction"
+      />
 
-          <l-control-scale
-            position="topright"
-            :imperial="false"
-            :metric="true"
-          ></l-control-scale>
-          <l-control :position="'bottomleft'">
-            <v-expansion-panels>
-              <v-expansion-panel>
-                <v-expansion-panel-header> Lejant </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-card
-                    v-for="(legendElement, index) in legend"
-                    :key="index"
-                    class="pa-2"
-                    align="left"
-                    tile
-                  >
-                    <img
-                      :src="require(`@/assets` + legendElement.icon)"
-                      height="20"
-                      width="20"
-                    />
-                    <small class="pl-3">{{ legendElement.text }}</small>
-                  </v-card>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </l-control>
-        </l-map>
-      </v-col>
-    </v-row>
-  </v-container>
+      <l-control-scale
+        position="topright"
+        :imperial="false"
+        :metric="true"
+      ></l-control-scale>
+      <l-control :position="'bottomleft'">
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header> Lejant </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-card
+                v-for="(legendElement, index) in legend"
+                :key="index"
+                class="pa-2"
+                align="left"
+                tile
+              >
+                <img
+                  :src="require(`@/assets` + legendElement.icon)"
+                  height="20"
+                  width="20"
+                />
+                <small class="pl-3">{{ legendElement.text }}</small>
+              </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </l-control>
+    </l-map>
+  </v-col>
 </template>
 
 <script>

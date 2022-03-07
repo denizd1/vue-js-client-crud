@@ -9,26 +9,24 @@
       ></v-img>
     </header> -->
     <v-main>
-      <v-container fluid>
-        <router-view />
-        <vue-particles
-          class="particle-bg"
-          color="#dedede"
-          :particleOpacity="0.7"
-          :particlesNumber="300"
-          shapeType="circle"
-          :particleSize="4"
-          linesColor="#dedede"
-          :linesWidth="1"
-          :lineLinked="true"
-          :lineOpacity="0.4"
-          :linesDistance="150"
-          :moveSpeed="3"
-          :hoverEffect="false"
-          :clickEffect="false"
-        >
-        </vue-particles>
-      </v-container>
+      <router-view />
+      <vue-particles
+        class="particle-bg"
+        color="#dedede"
+        :particleOpacity="0.7"
+        :particlesNumber="300"
+        shapeType="circle"
+        :particleSize="4"
+        linesColor="#dedede"
+        :linesWidth="1"
+        :lineLinked="true"
+        :lineOpacity="0.4"
+        :linesDistance="150"
+        :moveSpeed="3"
+        :hoverEffect="false"
+        :clickEffect="false"
+      >
+      </vue-particles>
     </v-main>
     <v-footer absolute padless app color="transparent">
       <v-col class="text-center" cols="12">
