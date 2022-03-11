@@ -8,22 +8,21 @@
     <v-tabs-items v-model="tab">
       <v-tab-item :key="1" value="listView" :eager="true">
         <v-row class="list px-3 mx-auto">
-          <v-col cols="12" md="8">
-            <v-text-field
-              v-model="searchTitle"
-              label="Nokta Adı ile Ara"
-            ></v-text-field>
+          <v-col cols="8">
+            <v-text-field v-model="searchTitle" label="Arama"></v-text-field>
           </v-col>
-          <v-col cols="12" sm="4">
-            <v-btn
-              small
-              @click="
-                page = 1;
-                retrieveTutorials();
-              "
-            >
-              Ara
-            </v-btn>
+          <v-col cols="4">
+            <v-card-actions class="justify-left mt-3">
+              <v-btn
+                small
+                @click="
+                  page = 1;
+                  retrieveTutorials(searchTitle);
+                "
+              >
+                <v-icon>mdi-database-search-outline</v-icon>
+              </v-btn>
+            </v-card-actions>
           </v-col>
           <!-- <search-detail></search-detail> -->
           <v-col cols="12" sm="12">
@@ -48,6 +47,11 @@
                 ></v-pagination>
               </v-col>
             </v-row>
+          </v-col>
+          <v-col class="py-0" cols="12" sm="12">
+            <p style="margin-bottom: 0px">
+              Toplam {{ tutorialCount }} öğe bulundu.
+            </p>
           </v-col>
 
           <v-col cols="12" sm="12">
@@ -107,6 +111,7 @@ export default {
       searchTitle: "",
       page: 1,
       totalPages: 0,
+      tutorialCount: 0,
       pageSize: 5,
       pageSizes: [5, 10, 15],
       selectedCity: null,
@@ -177,6 +182,17 @@ export default {
     selectedCity: {
       handler: function (selectedCity) {
         if (selectedCity !== null) {
+          this.selectedDistrict = null;
+          this.page = 1;
+          this.retrieveTutorials();
+          this.componentKey += 1;
+        }
+      },
+      immediate: true,
+    },
+    selectedDistrict: {
+      handler: function (selectedDistrict) {
+        if (selectedDistrict !== null) {
           this.page = 1;
           this.retrieveTutorials();
           this.componentKey += 1;
@@ -207,6 +223,7 @@ export default {
       if (this.selectedDistrict != null) {
         searchTitle = this.selectedDistrict;
         this.searchTitle = this.selectedDistrict;
+
         params["ilce"] = searchTitle;
       }
 
@@ -220,18 +237,29 @@ export default {
 
       return params;
     },
-    retrieveTutorials() {
-      var params = this.getRequestParams(
-        this.searchTitle,
-        this.page,
-        this.pageSize
-      );
+    retrieveTutorials(searchTitle) {
+      var params = null;
+      if (searchTitle) {
+        params = {
+          il: searchTitle,
+          page: this.page - 1,
+          size: this.pageSize,
+        };
+      } else {
+        params = this.getRequestParams(
+          this.searchTitle,
+          this.page,
+          this.pageSize
+        );
+      }
+      console.log(params);
 
       TutorialDataService.getAll(params)
         .then((response) => {
-          const { tutorials, totalPages } = response.data;
+          const { tutorials, totalPages, totalItems } = response.data;
           this.tutorials = tutorials.map(this.getDisplayTutorial);
           this.totalPages = totalPages;
+          this.tutorialCount = totalItems;
         })
         .catch((e) => {
           console.log(e);

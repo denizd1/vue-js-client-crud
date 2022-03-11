@@ -8,23 +8,6 @@
       app
       style="z-index: 200 !important"
     >
-      <!-- <v-navigation-drawer
-      style="top: 64px !important; z-index: 200 !important"
-      permanent
-      app
-      :hide-overlay="true"
-      :mini-variant="true"
-      :expand-on-hover="true"
-      :stateless="cityselect"
-      light
-      :style="{
-        'max-height': `calc(100% - 64px) !important`,
-      }"
-    > -->
-      <!-- :style="{
-      'max-height': `calc(100% - 76px) !important`,
-    }" -->
-      <!-- expand-on-hover -->
       <v-divider class="mt-0"></v-divider>
       <v-list v-if="!currentUser">
         <v-list-item
@@ -266,6 +249,9 @@ export default {
   },
   methods: {
     handleCityChange(event) {
+      this.methodSelect.filter((item) => {
+        item.checked = false;
+      });
       bus.$emit("cityChanged", event);
       this.citytoEmit = event;
       this.scaleControls.filter((item) => {
@@ -369,6 +355,6 @@ export default {
   width: 50px;
   height: 50px;
   position: absolute;
-  left: 45%;
+  left: 48%;
 }
 </style>

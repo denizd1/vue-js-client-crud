@@ -82,7 +82,6 @@ export default {
       var params = ProfilePlotter(currentTutorial);
       this.center = params.center;
       this.currentCenter = params.currentCenter;
-      this.currentCenter = params.currentCenter;
       this.markerLatlong = params.markerLatlong;
       this.polyline = params.polyline;
     },

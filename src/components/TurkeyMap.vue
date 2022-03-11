@@ -119,7 +119,9 @@ function onEachFeature(feature, layer) {
       e.originalEvent.target.classList.remove("pseudoClass");
       v.$emit("searchParam", this.feature.properties.name);
       v.selectedCityparam = this.feature.properties.name;
+
       v.dataService(this.feature.properties.name, null, v.methodarr);
+      v.$emit("searchParam", this.feature.properties.name, "il");
     });
     layer.on("mouseover", function (e) {
       document
@@ -364,6 +366,7 @@ export default {
       }, 100);
     });
     bus.$on("cityChanged", (city) => {
+      this.methodarr = [];
       if (this.$refs.map) {
         this.scaleService(0);
         setTimeout(() => {
@@ -388,7 +391,6 @@ export default {
       this.changeScale(val);
     });
     bus.$on("methodParam", (name, checked, city, district) => {
-      console.log(checked);
       if (checked === true) {
         if (!this.methodarr.includes(name)) {
           this.methodarr.push(name);
@@ -396,8 +398,8 @@ export default {
       } else {
         this.methodarr = this.methodarr.filter((e) => e !== name);
       }
-      this.dataService(city, district, this.methodarr);
       console.log(this.methodarr);
+      this.dataService(city, district, this.methodarr);
     });
     bus.$on("hideGeojson", (data) => {
       this.showGeojson = data;

@@ -107,8 +107,8 @@
       </v-tab-item>
     </v-tabs-items>
   </v-col>
-  <v-col cols="12" align="center" class="list mx-auto" v-else>
-    <v-card>
+  <v-col cols="4" align="center" class="mx-auto" v-else>
+    <v-card style="z-index: 99">
       <v-card-title class="justify-center">
         Proje(ler) Başarıyla Eklendi!
       </v-card-title>
