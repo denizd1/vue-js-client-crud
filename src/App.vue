@@ -14,7 +14,7 @@
         class="particle-bg"
         color="#dedede"
         :particleOpacity="0.7"
-        :particlesNumber="300"
+        :particlesNumber="500"
         shapeType="circle"
         :particleSize="4"
         linesColor="#dedede"

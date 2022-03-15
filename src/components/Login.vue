@@ -18,7 +18,7 @@
           />
           <div
             v-if="errors.has('username')"
-            class="alert alert-danger"
+            class="alert alert-danger mt-2"
             role="alert"
           >
             Bu alan boş bırakılamaz
@@ -35,7 +35,7 @@
           />
           <div
             v-if="errors.has('password')"
-            class="alert alert-danger"
+            class="alert alert-danger mt-2"
             role="alert"
           >
             Bu alan boş bırakılamaz

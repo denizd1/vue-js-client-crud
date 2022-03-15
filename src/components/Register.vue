@@ -15,13 +15,13 @@
               v-validate="'required|min:3|max:20'"
               type="text"
               class="form-control"
-              name="username"
+              name="Kullanıcı Adı"
             />
             <div
-              v-if="submitted && errors.has('username')"
-              class="alert-danger"
+              v-if="submitted && errors.has('Kullanıcı Adı')"
+              class="alert-danger mt-2"
             >
-              {{ errors.first("username") }}
+              {{ errors.first("Kullanıcı Adı") }}
             </div>
           </div>
           <div class="form-group mb-3">
@@ -31,10 +31,13 @@
               v-validate="'required|email|max:50'"
               type="email"
               class="form-control"
-              name="email"
+              name="Email"
             />
-            <div v-if="submitted && errors.has('email')" class="alert-danger">
-              {{ errors.first("email") }}
+            <div
+              v-if="submitted && errors.has('Email')"
+              class="alert-danger mt-2"
+            >
+              {{ errors.first("Email") }}
             </div>
           </div>
           <div class="form-group mb-3">
@@ -44,13 +47,13 @@
               v-validate="'required|min:6|max:40'"
               type="password"
               class="form-control"
-              name="password"
+              name="Şifre"
             />
             <div
-              v-if="submitted && errors.has('password')"
-              class="alert-danger"
+              v-if="submitted && errors.has('Şifre')"
+              class="alert-danger mt-2"
             >
-              {{ errors.first("password") }}
+              {{ errors.first("Şifre") }}
             </div>
           </div>
           <div class="form-group mb-3">
@@ -103,6 +106,9 @@ export default {
             (data) => {
               this.message = data.message;
               this.successful = true;
+              setTimeout(() => {
+                this.$router.push("/login");
+              }, 2000);
             },
             (error) => {
               this.message =

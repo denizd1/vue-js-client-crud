@@ -27,7 +27,9 @@
           <v-avatar color="primary" size="36"
             ><span class="white--text">{{
               currentUser.username.split(".")[0].charAt(0) +
-              currentUser.username.split(".")[1].charAt(0)
+              (currentUser.username.split(".")[1]
+                ? currentUser.username.split(".")[1].charAt(0)
+                : "")
             }}</span></v-avatar
           >
         </v-list-item>

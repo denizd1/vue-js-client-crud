@@ -11,7 +11,10 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
-import VeeValidate from 'vee-validate';
+import VeeValidate, {Validator} from 'vee-validate';
+import tr from 'vee-validate/dist/locale/tr'
+
+
 import Vuex from 'vuex';
 // import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -37,6 +40,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.use(VueParticles);
 Vue.use(Vuex);
 Vue.use(VeeValidate);
+Validator.localize('tr', tr)
 
 setupInterceptors(store);
 export const bus = new Vue();

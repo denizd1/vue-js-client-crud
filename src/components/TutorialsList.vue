@@ -252,7 +252,6 @@ export default {
           this.pageSize
         );
       }
-      console.log(params);
 
       TutorialDataService.getAll(params)
         .then((response) => {
